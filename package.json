@@ -1,0 +1,28 @@
+{
+  "name": "easy-cloudflare-ddns",
+  "version": "1.0.0",
+  "main": "app.js",
+  "author": "borrageiros",
+  "license": "MIT",
+  "scripts": {
+    "prestart": "test -d interface/build || yarn build:client",
+    "start": "node app.js",
+    "predev": "test -d interface/build || yarn build:client",
+    "dev": "nodemon",
+    "dev:client": "cd interface && yarn dev",
+    "build:client": "cd interface && yarn build"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "external-ip": "^2.3.1",
+    "jsonwebtoken": "^9.0.2",
+    "nedb": "^1.8.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.3"
+  }
+}

@@ -1,0 +1,25 @@
+{
+	"name": "admin-panel",
+	"version": "1.0.0",
+	"description": "Admin panel for auth-api",
+	"main": "index.js",
+	"author": "borrageiros",
+	"license": "MIT",
+	"scripts": {
+		"dev": "vite dev",
+		"build": "vite build",
+		"preview": "vite preview"
+	},
+	"devDependencies": {
+		"@sveltejs/adapter-auto": "^2.0.0",
+		"@sveltejs/kit": "^1.20.4",
+		"svelte": "^4.2.15",
+		"vite": "^4.4.2"
+	},
+	"type": "module",
+	"dependencies": {
+		"@sveltejs/adapter-static": "^2.0.3",
+		"@sveltestrap/sveltestrap": "^6.2.7",
+		"svelte-spa-router": "^3.3.0"
+	}
+}
