@@ -37,7 +37,9 @@
   }
 </script>
 
+{#if auth}
 <div>
   <Nav updateAppStatus={updateAppStatus} />
   <ElementsContainer appStatus={appStatus} updateAppStatus={updateAppStatus} />
 </div>
+{/if}

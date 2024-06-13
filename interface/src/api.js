@@ -26,6 +26,52 @@ export async function login( window, password ) {
 
 
 // --------------------------------------------------------------
+export async function generateApiToken( window ) {
+    const currentUrl = window.location.href;
+    const urlObject = new URL(currentUrl);
+    const apiUrl = urlObject.origin + "/api";
+    const auth = await storage.getItem("Authorization");
+    try {
+        const response = await fetch( apiUrl + "/generate-api-token", {
+            method: 'GET',
+            headers: {
+                'Authorization': auth
+            }
+        });
+
+        return await response.json();
+    } catch (error) {
+        throw error;
+    }
+}
+// --------------------------------------------------------------
+
+
+
+// --------------------------------------------------------------
+export async function togglePauseInterval( window ) {
+    const currentUrl = window.location.href;
+    const urlObject = new URL(currentUrl);
+    const apiUrl = urlObject.origin + "/api";
+    const auth = await storage.getItem("Authorization");
+    try {
+        const response = await fetch( apiUrl + "/toggle-pause-interval", {
+            method: 'GET',
+            headers: {
+                'Authorization': auth
+            }
+        });
+
+        return await response.json();
+    } catch (error) {
+        throw error;
+    }
+}
+// --------------------------------------------------------------
+
+
+
+// --------------------------------------------------------------
 export async function getAppSatus( window ) {
     const currentUrl = window.location.href;
     const urlObject = new URL(currentUrl);

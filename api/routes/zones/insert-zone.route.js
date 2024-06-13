@@ -5,6 +5,112 @@ const { getZoneInfo } = require('../../cloudflare-api');
 
 console.log("🆗 /zone POST");
 
+/**
+ * @swagger
+ * /api/zone:
+ *   post:
+ *     summary: Create a new zone
+ *     description: Create a new DNS zone.
+ *     tags:
+ *       - Zone
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: borrageiros.com
+ *               zoneId:
+ *                 type: string
+ *                 example: asdibLSLJihbJKCVkuiflikjb
+ *     responses:
+ *       200:
+ *         description: Zone created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     type:
+ *                       type: string
+ *                       example: zone
+ *                     name:
+ *                       type: string
+ *                       example: example.com
+ *                     zoneId:
+ *                       type: string
+ *                       example: asdibLSLJihbJKCVkuiflikjb
+ *                     _id:
+ *                       type: string
+ *                       example: 60c5f16f45a3a448e0c99e18
+ *       400:
+ *         description: Bad request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Missing or invalid "name" field in request body. Please provide a valid "name"
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Unauthorized
+ *       403:
+ *         description: Forbidden
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Forbidden
+ *       404:
+ *         description: Not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Zone not found in your CloudFlare account
+ *       409:
+ *         description: Conflict
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: The zone with the provided "name" or "id" already exists
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Internal Server Error
+ */
+
 router.post('/', (req, res) => {
     const { name, zoneId } = req.body;
 

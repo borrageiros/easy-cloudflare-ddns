@@ -15,7 +15,7 @@
   } from "@sveltestrap/sveltestrap";
   import ZoneCard from "./ZoneCard.svelte";
   import { onMount } from "svelte";
-  import { getZones, insertZone, getRecords, insertRecord, forceInterval } from "../api";
+  import { getZones, insertZone, getRecords, insertRecord, forceInterval, togglePauseInterval } from "../api";
   import RecordCard from "./RecordCard.svelte";
 
   export let appStatus;
@@ -43,6 +43,11 @@
       }, opacityTime * 2);
     }
     await forceInterval( window );
+    updateAppStatus();
+  }
+
+  async function handleTogglePause() {
+    await togglePauseInterval();
     updateAppStatus();
   }
   
@@ -201,19 +206,38 @@
     {#if appStatus}
     <Card body inverse outline={false} color="dark">
       <div style="display: flex; justify-content: space-between;">
+
         <div>
           <span style="opacity: 0.3;">Actual IP: </span>
           <span>{appStatus && appStatus.externalIp}</span>
         </div>
+
         <div>
-          <span style="opacity: 0.3;">Next check in: </span>
-          <span id="remainingTime-span">{appStatus && msToTime(appStatus.remainingTime)}</span>
-          &nbsp;&nbsp;
+          {#if !appStatus.isPaused}
+            <span style="opacity: 0.3;">Next check in: </span>
+            <span id="remainingTime-span">{appStatus && msToTime(appStatus.remainingTime)}</span>
+          {/if}
+
+          
+          {#if appStatus.isPaused}
+            <Button id="resume-button-tooltip" size="sm" outline color="secondary" on:click={handleTogglePause}>
+              <i class="bi bi-play-fill"></i>
+            </Button>
+            <Tooltip target="resume-button-tooltip" placement="top">Start check interval <br/> (this forces an instant check)</Tooltip>
+          {:else}
+            <Button id="pause-button-tooltip" size="sm" outline color="secondary" on:click={handleTogglePause}>
+              <i class="bi bi-pause-fill"></i>
+            </Button>
+            <Tooltip target="pause-button-tooltip" placement="top">Pause check interval</Tooltip>
+          {/if}
+
           <Button id="force-button-tooltip" size="sm" outline color="secondary" on:click={handleForceCheck}>
             <i class="bi bi-arrow-right-circle"></i>
           </Button>
           <Tooltip target="force-button-tooltip" placement="top">Force IP check</Tooltip>
+
         </div>
+
       </div>
     </Card>    
     {/if}

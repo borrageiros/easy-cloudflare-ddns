@@ -19,14 +19,18 @@
   } from "@sveltestrap/sveltestrap";
   import storage from "../storage";
   import { onMount } from "svelte";
-  import { getConfig, insertConfig, updateConfig } from "../api";
+  import { getConfig, insertConfig, updateConfig, generateApiToken } from "../api";
+  import { copyText  } from 'svelte-copy';
 
   export let updateAppStatus;
 
-  let auth;
   let config;
+  let apiToken;
+  let alertCopied;
+
   let editConfigModalOpen = false;
   let createConfigModalOpen = false;
+  let generateApiKeyModalOpen = false;
 
   let email = "";
   let authToken = "";
@@ -48,6 +52,29 @@
   async function logOut() {
     storage.remove("Authorization");
     window.location.assign("/login");
+  }
+
+  async function openGenerateApiKey() {
+    apiToken = await generateApiToken();
+    apiToken = apiToken.token;
+    generateApiKeyModalOpen = true;
+  }
+
+  function closeGenerateApiKey() {
+    alertCopied = "";
+    generateApiKeyModalOpen = false;
+  }
+
+  function handleVisitApiDocs() {
+    const currentUrl = window.location.href;
+    const urlObject = new URL(currentUrl);
+    const docsUrl = urlObject.origin + "/api-docs";
+    window.open(docsUrl, '_blank');
+  }
+
+  function handleCopyText() {
+    copyText(apiToken);
+    alertCopied = "Key copied!";
   }
 
   function openEditConfigModal() {
@@ -145,12 +172,16 @@
   <Nav class="ms-auto" navbar>
     <Dropdown direction="down">
       <DropdownToggle nav caret style="font-size: 1.3rem; margin-left: 100px">
-        <i class="bi bi-gear-fill" style="font-size: 1.3rem;" />
+        <i class="bi bi-gear" style="font-size: 1.3rem;" />
       </DropdownToggle>
       <DropdownMenu>
         <DropdownItem on:click={openEditConfigModal} style="font-size: 1.3rem;">
-          <i class="bi bi-gear-fill" />
+          <i class="bi bi-gear" />
           Configuration
+        </DropdownItem>
+        <DropdownItem on:click={openGenerateApiKey} style="font-size: 1.3rem;">
+          <i class="bi bi-lock"></i>
+          Generate API KEY
         </DropdownItem>
         <DropdownItem class="text-danger" on:click={logOut} style="font-size: 1.3rem;">
           <i class="bi bi-box-arrow-left" />
@@ -253,6 +284,26 @@
   <ModalFooter>
     <Button color="secondary" on:click={closeEditConfigModal}>Close</Button>
     <Button color="primary" on:click={editConfig}>Save</Button>
+  </ModalFooter>
+</Modal>
+
+<!-- MODAL GENERATE API KEY -->
+<Modal bind:isOpen={generateApiKeyModalOpen} onClose={closeGenerateApiKey} centered={true}>
+  <ModalHeader>API KEY</ModalHeader>
+  <ModalBody>
+    {#if alertCopied}
+      <Alert color="success">{alertCopied}</Alert>
+    {/if}
+    <Input style="height: 150px"
+      placeholder={apiToken && apiToken}
+      type="textarea"
+      disabled
+    />
+  </ModalBody>
+  <ModalFooter>
+    <Button color="warning"  on:click={handleCopyText}>Copy to clipboard</Button>
+    <Button color="primary"  on:click={handleVisitApiDocs}>Visit API documentation</Button>
+    <Button color="secondary" on:click={closeGenerateApiKey}>Close</Button>
   </ModalFooter>
 </Modal>
 
