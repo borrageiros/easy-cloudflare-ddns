@@ -47,7 +47,7 @@
   }
 
   async function handleTogglePause() {
-    await togglePauseInterval();
+    await togglePauseInterval( window );
     updateAppStatus();
   }
   

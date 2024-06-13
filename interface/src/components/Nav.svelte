@@ -55,7 +55,7 @@
   }
 
   async function openGenerateApiKey() {
-    apiToken = await generateApiToken();
+    apiToken = await generateApiToken( window );
     apiToken = apiToken.token;
     generateApiKeyModalOpen = true;
   }
