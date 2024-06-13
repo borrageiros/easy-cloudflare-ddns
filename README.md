@@ -61,7 +61,7 @@ You need an api-key (generable from the interface itself)
 
 This can be useful in certain cases, here is an example using [HomePage](https://gethomepage.dev/) to display the general status
 
-![screenshot_2](./readme/screenshot_2.jpg)
+![screenshot_2](./readme/screenshot_2.png)
 
 
 ## 📝 Node.js Installation
