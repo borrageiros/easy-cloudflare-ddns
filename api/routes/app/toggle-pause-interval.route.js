@@ -1,15 +1,16 @@
 const express = require('express');
+const getExternalIP = require('../../get-external-ip');
+const { getIsPaused, pauseInterval, resumeInterval } = require('../../check-interval');
 const router = express.Router();
-const { executeUpdater } = require('../../check-interval');
 
-console.log("🆗 /force-interval POST");
+console.log("🆗 /toggle-pause-interval GET");
 
 /**
  * @swagger
- * /api/force-interval:
- *   post:
- *     summary: Force interval update
- *     description: Endpoint to force the update of the interval.
+ * /api/toggle-pause-interval:
+ *   get:
+ *     summary: Toggle pause interval
+ *     description: Toggle the pause state of the interval. If the interval is paused, it will be resumed. If it is running, it will be paused.
  *     tags:
  *       - App
  *     security:
@@ -24,7 +25,7 @@ console.log("🆗 /force-interval POST");
  *               properties:
  *                 message:
  *                   type: string
- *                   example: Forced successfully
+ *                   example: Interval resumed!
  *       401:
  *         description: Unauthorized
  *         content:
@@ -57,13 +58,19 @@ console.log("🆗 /force-interval POST");
  *                   example: Internal Server Error
  */
 
-router.post('/', async (req, res) => {
-  try {
-    executeUpdater();
-    res.status(200).json({ message: "Forced successfully" });
-  } catch (error) {
-    res.status(500).json({ error: error });
-  }  
+router.get('/', async (req, res) => {
+    try {
+        const isPaused = await getIsPaused();
+        if ( isPaused ) {
+            await resumeInterval();
+            res.status(200).json({ message: "Interval resumed!" });
+        } else {
+            await pauseInterval();
+            res.status(200).json({ message: "Interval paused!" });
+        }
+    } catch (error) {
+        res.status(500).json({ error: error });
+    }
 });
 
 module.exports = router;

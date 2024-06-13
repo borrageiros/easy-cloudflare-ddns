@@ -5,6 +5,113 @@ const { getRecordId } = require('../../cloudflare-api');
 
 console.log("🆗 /record POST");
 
+/**
+ * @swagger
+ * /api/record:
+ *   post:
+ *     summary: Create a new record
+ *     description: Create a new DNS record.
+ *     tags:
+ *       - Record
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: ddns.borrageiros.com
+ *               zoneId:
+ *                 type: string
+ *                 example: asdibLSLJihbJKCVkuiflikjb
+ *               proxy:
+ *                 type: boolean
+ *                 example: true
+ *               ttl:
+ *                 type: integer
+ *                 example: 0
+ *     responses:
+ *       200:
+ *         description: Record created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: object
+ *                   example: { type: "record", name: "ddns.borrageiros.com", zoneId: "asdibLSLJihbJKCVkuiflikjb", proxy: true, ttl: 0, recordId: "akIKGvuhKJHGkjvJlkGHKjgLK", "_id": "60c5f16f45a3a448e0c99e18" }
+ *       400:
+ *         description: Bad request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Missing or invalid "name" field in request body. Please provide a valid "name"
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Unauthorized
+ *       403:
+ *         description: Forbidden
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Forbidden
+ *       404:
+ *         description: Record not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   example: 404
+ *                 error:
+ *                   type: string
+ *                   example: Record not found in your CloudFlare account
+ *       409:
+ *         description: Conflict - record with the provided name already exists
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   example: 409
+ *                 error:
+ *                   type: string
+ *                   example: The record with the provided name already exists
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Internal Server Error
+ */
+
+
 router.post('/', async (req, res) => {
     const { name, zoneId, proxy, ttl } = req.body;
 

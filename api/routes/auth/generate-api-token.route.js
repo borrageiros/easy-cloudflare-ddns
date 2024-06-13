@@ -1,17 +1,18 @@
 const express = require('express');
 const router = express.Router();
-const { executeUpdater } = require('../../check-interval');
+const jwt = require('jsonwebtoken');
+const { getJwtSecret } = require('../../jwt-config');
 
-console.log("🆗 /force-interval POST");
+console.log("🆗 /generate-api-token");
 
 /**
  * @swagger
- * /api/force-interval:
- *   post:
- *     summary: Force interval update
- *     description: Endpoint to force the update of the interval.
+ * /api/generate-api-token:
+ *   get:
+ *     summary: Generate API token
+ *     description: Generate a new API token.
  *     tags:
- *       - App
+ *       - Auth
  *     security:
  *       - apiKeyAuth: []
  *     responses:
@@ -22,9 +23,9 @@ console.log("🆗 /force-interval POST");
  *             schema:
  *               type: object
  *               properties:
- *                 message:
+ *                 token:
  *                   type: string
- *                   example: Forced successfully
+ *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
  *       401:
  *         description: Unauthorized
  *         content:
@@ -57,13 +58,13 @@ console.log("🆗 /force-interval POST");
  *                   example: Internal Server Error
  */
 
-router.post('/', async (req, res) => {
+router.get('/', (req, res) => {
   try {
-    executeUpdater();
-    res.status(200).json({ message: "Forced successfully" });
+    const token = jwt.sign({ type: "api-token" }, getJwtSecret());
+    return res.json({ token });
   } catch (error) {
     res.status(500).json({ error: error });
-  }  
+  } 
 });
 
 module.exports = router;

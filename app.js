@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const swaggerSpec = require('./swagger');
+const swaggerUi = require('swagger-ui-express');
 dotenv.config();
 require('./api/check-interval');
 require('./database/db');
@@ -16,6 +18,7 @@ restApi.use(cors());
 
 restApi.use("/", express.static('./interface/build', { 'Content-Type': 'application/javascript' }));
 restApi.use("/login", express.static('./interface/build', { 'Content-Type': 'application/javascript' }));
+restApi.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 restApi.use('/api', api);
 restApi.listen(port, () => {

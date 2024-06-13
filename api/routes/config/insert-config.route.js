@@ -7,6 +7,98 @@ const { checkAuth } = require('../../cloudflare-api');
 
 console.log("🆗 /config POST");
 
+/**
+ * @swagger
+ * /api/config:
+ *   post:
+ *     summary: Create configuration
+ *     description: Create a new configuration document if it does not already exist.
+ *     tags:
+ *       - Config
+ *     security:
+ *       - apiKeyAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: email@email.com 
+ *               token:
+ *                 type: string
+ *                 example: LOKADFBIAlASJLDAS
+ *               checkInterval:
+ *                 type: integer
+ *                 example: 1440
+ *     responses:
+ *       200:
+ *         description: Configuration created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: object
+ *                   example: { type: "config", email: "email@email.com", token: "LOKADFBIAlASJLDAS", checkInterval: 1440, "_id": "IdkIAFkbadsoIDSF" }
+ *       400:
+ *         description: Bad request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Missing or invalid "email" field in request body. Please provide a valid "email"
+ *       401:
+ *         description: Unauthorized - incorrect CloudFlare credentials
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   example: 401
+ *                 error:
+ *                   type: string
+ *                   example: Incorrect CloudFlare credentials
+ *       403:
+ *         description: Forbidden
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Forbidden
+ *       409:
+ *         description: Conflict - configuration already exists
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Config already exist
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Internal Server Error
+ */
+
 router.post('/', async (req, res) => {
     const { email, token, checkInterval } = req.body;
     const externalIp = await getExternalIP();

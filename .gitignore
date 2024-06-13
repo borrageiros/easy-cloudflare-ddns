@@ -2,6 +2,7 @@
 interface/node_modules/
 interface/build/
 interface/.svelte-kit/
+interface/vite.config.js.timestamp*
 
 ### Database ###
 database/data/

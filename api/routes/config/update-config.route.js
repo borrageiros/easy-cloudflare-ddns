@@ -7,6 +7,101 @@ const { checkAuth } = require('../../cloudflare-api');
 
 console.log("🆗 /config PUT");
 
+/**
+ * @swagger
+ * /api/config:
+ *   put:
+ *     summary: Update configuration
+ *     description: Update an existing configuration document.
+ *     tags:
+ *       - Config
+ *     security:
+ *       - apiKeyAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: email@email.com 
+ *               token:
+ *                 type: string
+ *                 example: LOKADFBIAlASJLDAS
+ *               checkInterval:
+ *                 type: integer
+ *                 example: 1440
+ *     responses:
+ *       200:
+ *         description: Document updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Document updated successfully
+ *                 data:
+ *                   type: object
+ *                   example: { type: "config", email: "email@email.com", token: "LOKADFBIAlASJLDAS", checkInterval: 1440, "_id": "IdkIAFkbadsoIDSF" }
+ *       400:
+ *         description: Bad request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Missing field to update in request body. Please provide a valid "email", "token" or "checkInterval"
+ *       401:
+ *         description: Unauthorized - incorrect CloudFlare credentials
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   example: 401
+ *                 error:
+ *                   type: string
+ *                   example: Incorrect CloudFlare credentials
+ *       403:
+ *         description: Forbidden
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Forbidden
+ *       404:
+ *         description: Config not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Config not found
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Internal Server Error
+ */
+
 router.put('/', async (req, res) => {
     const { email, token, checkInterval } = req.body;
     

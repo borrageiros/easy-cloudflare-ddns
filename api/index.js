@@ -13,6 +13,8 @@ const insertZone = require('./routes/zones/insert-zone.route');
 const deleteZone = require('./routes/zones/delete-zone.route');
 const login = require('./routes/auth/login.route');
 const app = require('./routes/app/get-app-status.route');
+const generateApiToken = require('./routes/auth/generate-api-token.route');
+const togglePauseInterval = require('./routes/app/toggle-pause-interval.route');
 const forceInterval = require('./routes/app/force-interval.route');
 
 const authenticateJWT = (req, res, next) => {
@@ -45,6 +47,8 @@ router.use('/zone', authenticateJWT, deleteZone);
 
 router.use('/login', login);
 router.use('/app', authenticateJWT, app);
+router.use('/generate-api-token', authenticateJWT, generateApiToken);
+router.use('/toggle-pause-interval', authenticateJWT, togglePauseInterval);
 router.use('/force-interval', authenticateJWT, forceInterval);
 
 module.exports = router;

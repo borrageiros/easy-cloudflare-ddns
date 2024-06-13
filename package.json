@@ -9,6 +9,7 @@
     "start": "node app.js",
     "predev": "test -d interface/build || yarn build:client",
     "dev": "nodemon",
+    "dev:server": "nodemon app.js",
     "dev:client": "cd interface && yarn dev",
     "build:client": "cd interface && yarn build"
   },
@@ -20,7 +21,9 @@
     "express": "^4.19.2",
     "external-ip": "^2.3.1",
     "jsonwebtoken": "^9.0.2",
-    "nedb": "^1.8.0"
+    "nedb": "^1.8.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.3"
