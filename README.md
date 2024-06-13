@@ -52,6 +52,17 @@ docker run -d
 borrageiros/easy-cloudflare-ddns
 ```
 
+## 📡 Api
+
+There is documentation of the api in the /api-docs endpoint:  
+http://localhost:3000/api-docs
+
+You need an api-key (generable from the interface itself)  
+
+This can be useful in certain cases, here is an example using [HomePage](https://gethomepage.dev/) to display the general status
+
+![screenshot_2](./readme/screenshot_2.jpg)
+
 
 ## 📝 Node.js Installation
 
