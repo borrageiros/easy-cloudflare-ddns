@@ -11,7 +11,7 @@ Using this application is very simple:
 - Start the application, either with Docker (recommended) or with Node.js
 - Enter your CloudFlare credentials (email and API key)
 - Create as many zones as you want (domains)
-- Create as many records as you want (subdomains)
+- Create as many records as you want (domains or subdomains to update, the same as in the cloudflare table) 
 
 The application will periodically (time configurable in minutes) check if your device's public IP has changed. If it has, it will update all the specified records in Cloudflare with the new IP. It's that simple!
 
