@@ -1,0 +1,43 @@
+
+:root {
+  --background-color: #ffffff;
+  --text-color: #000000;
+  --card-background: #ffffff;
+  --border-color: #ddd;
+  --input-background: #ffffff;
+  --input-border: #ced4da;
+}
+
+:root.dark {
+  --background-color: #1a1a1a;
+  --text-color: #ffffff;
+  --card-background: #262626;
+  --border-color: #34495e;
+  --input-background: #333333;
+  --input-border: #4a4a4a;
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Estilos para inputs y botones en modo oscuro */
+.dark input,
+.dark select,
+.dark textarea {
+  background-color: var(--input-background);
+  color: var(--text-color);
+  border-color: var(--input-border);
+}
+
+.dark .card {
+  background-color: var(--card-background);
+  border-color: var(--border-color);
+}
+
+.dark .modal-content {
+  background-color: var(--card-background);
+  color: var(--text-color);
+}

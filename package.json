@@ -5,6 +5,7 @@
   "author": "borrageiros",
   "license": "MIT",
   "scripts": {
+    "postinstall": "cd interface && yarn install",
     "prestart": "test -d interface/build || yarn build:client",
     "start": "node app.js",
     "predev": "test -d interface/build || yarn build:client",

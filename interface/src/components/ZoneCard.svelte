@@ -1,6 +1,7 @@
 <script>
   import { Button } from "@sveltestrap/sveltestrap";
   import { deleteZone } from "../api";
+  import { darkMode } from '../theme';
 
   export let updateZones;
   export let updateRecords;
@@ -13,7 +14,7 @@
   }
 </script>
 
-<div class="card">
+<div class="card" class:dark={$darkMode}>
   <div class="card-body">
     <div class="info">
       <h5 class="card-title">{zone.name}</h5>
@@ -29,11 +30,13 @@
 
 <style>
   .card {
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
     border-radius: 4px;
     padding: 16px;
     margin: 8px 0;
     width: 100%;
+    background-color: var(--card-background);
+    color: var(--text-color);
   }
 
   .card-body {
@@ -59,7 +62,8 @@
 
   .card-text {
     font-size: 1rem;
-    color: #666;
+    color: var(--text-color);
+    opacity: 0.7;
   }
 
   .action {

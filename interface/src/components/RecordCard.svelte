@@ -11,6 +11,7 @@
     Tooltip,
   } from "@sveltestrap/sveltestrap";
   import { updateRecord, deleteRecord } from "../api";
+  import { darkMode } from '../theme';
 
   const ttlOptions = [
     { label: 'Auto', value: 0 },
@@ -93,7 +94,7 @@
   }
 </script>
 
-<div class="card">
+<div class="card" class:dark={$darkMode}>
   <div class="card-body">
     <div class="grid-container">
       <div class="grid-item">{record.name}</div>
@@ -109,7 +110,7 @@
       <div class="grid-item">TTL: {getTtlByValue(record.ttl)}</div>
 
       <div class="grid-item">
-        <Button outline color="primary" on:click={openUpdateRecordModal} >
+        <Button outline color="primary" on:click={openUpdateRecordModal}>
           <i class="bi bi-pencil-fill"></i>
         </Button>
       </div>
@@ -124,7 +125,7 @@
 </div>
 
 <!-- MODAL EDDIT RECORD -->
-<Modal bind:isOpen={updateRecordModalOpen} onClose={closeUpdateRecordModal} centered={true}>
+<Modal bind:isOpen={updateRecordModalOpen} onClose={closeUpdateRecordModal} centered={true} dark={$darkMode}>
   <ModalHeader>Edit {record.name}</ModalHeader>
   <ModalBody>
     {#if updateRecordValidationError}
@@ -182,11 +183,13 @@
 
 <style>
   .card {
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
     border-radius: 4px;
     padding: 16px;
     margin: 8px 0;
     width: 100%;
+    background-color: var(--card-background);
+    color: var(--text-color);
   }
 
   .card-body {
@@ -207,5 +210,16 @@
 
   i {
     cursor: pointer;
+  }
+
+  :global(.modal-content) {
+    background-color: var(--card-background);
+    color: var(--text-color);
+  }
+
+  :global(.form-control) {
+    background-color: var(--input-background);
+    color: var(--text-color);
+    border-color: var(--input-border);
   }
 </style>

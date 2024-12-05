@@ -30,7 +30,7 @@ class Storage {
             }
         }
         try {
-            return localStorage.getItem(key);
+            return localStorage.getItem(key) || "";
         } catch (error) {
             console.error('Error setting localStorage key:', key, error);
         }

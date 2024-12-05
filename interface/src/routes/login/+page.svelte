@@ -2,6 +2,7 @@
     import { login } from '../../api';
     import storage from '../../storage';
     import { onMount } from 'svelte';
+    import ThemeToggle from '../../components/ThemeToggle.svelte';
 
     let error;
     let password = "";
@@ -27,7 +28,10 @@
 
 <div class="main">
     <div class="container">
-        <h3 style="margin-bottom: 40px;">
+        <div class="theme-toggle-wrapper">
+            <ThemeToggle />
+        </div>
+        <h3 style="margin-top: 40px; margin-bottom: 40px;">
             Easy
             <i style="color: #f68a1d;" class="bi bi-cloud-fill">&nbsp;CloudFlare</i>
             DDNS
@@ -50,18 +54,26 @@
         justify-content: center;
         text-align: center;
         flex-direction: column;
+        background-color: var(--card-background);
+        color: var(--text-color);
     }
 
-    .container{
+    .container {
+        position: relative;
         width: 80%;
         max-width: 400px;
-        background-color: white;
-        border: 1px black solid;
+        border: 1px solid var(--border-color);
         border-radius: 10px;
-        padding: 20px;
+        padding: 40px 20px 20px;
     }
 
-    form{
+    .theme-toggle-wrapper {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+    }
+
+    form {
         display: flex;
         flex-direction: column;
     }
@@ -70,10 +82,12 @@
     button {
         margin-bottom: 15px;
         padding: 10px;
-        border: 1px solid #ccc;
+        border: 1px solid var(--input-border);
         border-radius: 5px;
         width: 100%;
         box-sizing: border-box;
+        background-color: var(--input-background);
+        color: var(--text-color);
     }
 
     button {
@@ -94,7 +108,7 @@
       color: blue;
     }
 
-    .register{
+    .register {
         margin-top: 20px;
     }
 

@@ -17,6 +17,7 @@
   import { onMount } from "svelte";
   import { getZones, insertZone, getRecords, insertRecord, forceInterval, togglePauseInterval } from "../api";
   import RecordCard from "./RecordCard.svelte";
+  import { darkMode } from '../theme';
 
   export let appStatus;
   export let updateAppStatus;
@@ -202,9 +203,9 @@
 </script>
 
 <div style="display: flex; justify-content: center; margin-top: 70px;">
-  <Accordion theme="dark" style="width: 65vw;">
+  <Accordion style="width: 65vw;" theme={$darkMode ? "dark" : "light"}>
     {#if appStatus}
-    <Card body inverse outline={false} color="dark">
+    <Card body inverse={$darkMode} outline={false} color={$darkMode ? "dark" : "light"}>
       <div style="display: flex; justify-content: space-between;">
 
         <div>
@@ -274,17 +275,18 @@
 
 
 <!-- MODAL CREATE ZONE -->
-<Modal bind:isOpen={createZoneModalOpen} onClose={closeCreateZoneModal} centered={true}>
+<Modal bind:isOpen={createZoneModalOpen} onClose={closeCreateZoneModal} centered={true} dark={$darkMode}>
   <ModalHeader>Create new zone</ModalHeader>
   <ModalBody>
     {#if createZoneValidationError}
       <Alert color="danger">{createZoneValidationError}</Alert>
     {/if}
 
-    <Label>Email</Label>
+    <Label>Name</Label>
     <i id="zone-name-tooltip" class="bi bi-info-circle-fill"></i>
     <Tooltip target="zone-name-tooltip" placement="top">This is only for identifying, you can really write whatever you want</Tooltip>
     <Input
+      theme={$darkMode ? "dark" : "light"}
       placeholder="Zone name (Example: borrageiros.com)"
       type="text"
       bind:value={zoneName}
@@ -297,6 +299,7 @@
     <Tooltip target="zoneId-tooltip" placement="top">The zone id, you can find it in the CloudFlare interface</Tooltip>
     <a href="https://developers.cloudflare.com/fundamentals/setup/find-account-and-zone-ids/" target="_blank">How to get zone ID</a>
     <Input
+      theme={$darkMode ? "dark" : "light"}
       placeholder="Zone ID"
       type="text"
       bind:value={zoneId}
@@ -311,7 +314,7 @@
 
 
 <!-- MODAL CREATE RECORD -->
-<Modal bind:isOpen={createRecordModalOpen} onClose={closeCreateRecordModal} centered={true}>
+<Modal bind:isOpen={createRecordModalOpen} onClose={closeCreateRecordModal} centered={true} dark={$darkMode}>
   <ModalHeader>Create new record</ModalHeader>
   <ModalBody>
     {#if createRecordValidationError}
@@ -322,6 +325,7 @@
     <i id="record-name-tooltip" class="bi bi-info-circle-fill"></i>
     <Tooltip target="record-name-tooltip" placement="top">This is exactly the full subdomain name (FQDN)</Tooltip>
     <Input
+      theme={$darkMode ? "dark" : "light"}
       placeholder="Record name (Example: ddns.borrageiros.com)"
       type="text"
       bind:value={recordName}
@@ -332,7 +336,7 @@
     <Label>Zone</Label>
     <i id="record-zone-tooltip" class="bi bi-info-circle-fill"></i>
     <Tooltip target="record-zone-tooltip" placement="top">The domain to which the document belongs</Tooltip>
-    <Input type="select" bind:value={recordSelectedZone} disabled={zones && zones.length === 1}>
+    <Input theme={$darkMode ? "dark" : "light"} type="select" bind:value={recordSelectedZone} disabled={zones && zones.length === 1}>
       {#each zones as option}
         <option value={option.zoneId}>{option.name}</option>
       {/each}
@@ -355,7 +359,7 @@
     <Label>TTL</Label>
     <i id="ttl-tooltip" class="bi bi-info-circle-fill"></i>
     <Tooltip target="ttl-tooltip" placement="top">Time to live (TTL) refers to the amount of time or “hops” that a packet is set to exist inside a network before being discarded by a router.</Tooltip>
-    <Input type="select" bind:value={ttlSelectedValue} disabled={recordProxy}>
+    <Input theme={$darkMode ? "dark" : "light"} type="select" bind:value={ttlSelectedValue} disabled={recordProxy}>
       {#each ttlOptions as option}
         <option value={option.value}>{option.label}</option>
       {/each}
@@ -372,5 +376,45 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+  }
+
+  :global(.accordion) {
+    background-color: var(--card-background);
+    border-color: var(--border-color);
+  }
+
+  :global(.accordion-item) {
+    background-color: var(--card-background);
+    border-color: var(--border-color);
+  }
+
+  :global(.accordion-button) {
+    background-color: var(--card-background);
+    color: var(--text-color);
+  }
+
+  :global(.accordion-button:not(.collapsed)) {
+    background-color: var(--input-background);
+    color: var(--text-color);
+  }
+
+  :global(.card) {
+    background-color: var(--card-background);
+    border-color: var(--border-color);
+  }
+
+  :global(.modal-content) {
+    background-color: var(--card-background);
+    color: var(--text-color);
+  }
+
+  :global(.form-control) {
+    background-color: var(--input-background);
+    color: var(--text-color);
+    border-color: var(--input-border);
+  }
+
+  :global(.accordion-button::after) {
+    filter: invert(var(--dark-mode-invert));
   }
 </style>
