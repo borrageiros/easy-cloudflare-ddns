@@ -314,8 +314,7 @@
 
 <style>
   :global(.navbar) {
-    background-color: var(--card-background) !important;
-    border-bottom: 1px solid var(--border-color);
+    background-color: var(--background-color) !important;
   }
 
   :global(.navbar-brand) {

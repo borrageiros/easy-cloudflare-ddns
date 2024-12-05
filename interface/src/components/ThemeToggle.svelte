@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Icon } from '@sveltestrap/sveltestrap';
+  import { Icon, Tooltip } from '@sveltestrap/sveltestrap';
   import { darkMode } from '../theme';
   import storage from '../storage';
   
@@ -17,11 +17,12 @@
 </script>
 
 <button class="dark-mode-toggle" on:click={toggleDarkMode} class:dark={$darkMode}>
+  <Tooltip target="dark-mode-toggle" placement="top">Toggle dark mode</Tooltip>
   {#if $darkMode}
-    <Icon name="sun-fill" class="sun-icon" />
+    <Icon id="dark-mode-toggle" name="sun-fill" class="sun-icon" />
   {/if}
   {#if !$darkMode}
-    <Icon name="moon-fill" />
+    <Icon id="dark-mode-toggle" name="moon-fill" />
   {/if}
 </button>
 
@@ -38,7 +39,7 @@
   .dark-mode-toggle.dark {
     background-color: #262626;
     color: white;
-    border-color: #34495e;
+    border-color: var(--border-color);
   }
 
   :global(.sun-icon) {

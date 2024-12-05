@@ -15,9 +15,16 @@
   } from "@sveltestrap/sveltestrap";
   import ZoneCard from "./ZoneCard.svelte";
   import { onMount } from "svelte";
-  import { getZones, insertZone, getRecords, insertRecord, forceInterval, togglePauseInterval } from "../api";
+  import {
+    getZones,
+    insertZone,
+    getRecords,
+    insertRecord,
+    forceInterval,
+    togglePauseInterval,
+  } from "../api";
   import RecordCard from "./RecordCard.svelte";
-  import { darkMode } from '../theme';
+  import { darkMode } from "../theme";
 
   export let appStatus;
   export let updateAppStatus;
@@ -29,33 +36,33 @@
   });
 
   async function handleForceCheck() {
-    const span = document.getElementById('remainingTime-span');
+    const span = document.getElementById("remainingTime-span");
     const opacityTime = 30;
     if (span) {
-      span.style.opacity = '0.5';
+      span.style.opacity = "0.5";
       setTimeout(() => {
-        span.style.opacity = '1';
+        span.style.opacity = "1";
       }, opacityTime);
       setTimeout(() => {
-        span.style.opacity = '0.5';
+        span.style.opacity = "0.5";
         setTimeout(() => {
-          span.style.opacity = '1';
+          span.style.opacity = "1";
         }, opacityTime * 3);
       }, opacityTime * 2);
     }
-    await forceInterval( window );
+    await forceInterval(window);
     updateAppStatus();
   }
 
   async function handleTogglePause() {
-    await togglePauseInterval( window );
+    await togglePauseInterval(window);
     updateAppStatus();
   }
-  
+
   function msToTime(s) {
     function pad(n, z) {
       z = z || 2;
-      return ('00' + n).slice(-z);
+      return ("00" + n).slice(-z);
     }
 
     var ms = s % 1000;
@@ -65,7 +72,7 @@
     var mins = s % 60;
     var hrs = (s - mins) / 60;
 
-    return pad(hrs) + ':' + pad(mins) + ':' + pad(secs);
+    return pad(hrs) + ":" + pad(mins) + ":" + pad(secs);
   }
 
   // RECORDS
@@ -73,31 +80,31 @@
   let recordName = "";
   let recordProxy = true;
   const ttlOptions = [
-    { label: 'Auto', value: 0 },
-    { label: '1min', value: 60 },
-    { label: '2min', value: 120 },
-    { label: '5min', value: 300 },
-    { label: '10min', value: 600 },
-    { label: '15min', value: 900 },
-    { label: '30min', value: 1800 },
-    { label: '1hr', value: 3600 },
-    { label: '2hr', value: 7200 },
-    { label: '5hr', value: 18000 },
-    { label: '12hr', value: 43200 },
-    { label: '1day', value: 86400 }
+    { label: "Auto", value: 0 },
+    { label: "1min", value: 60 },
+    { label: "2min", value: 120 },
+    { label: "5min", value: 300 },
+    { label: "10min", value: 600 },
+    { label: "15min", value: 900 },
+    { label: "30min", value: 1800 },
+    { label: "1hr", value: 3600 },
+    { label: "2hr", value: 7200 },
+    { label: "5hr", value: 18000 },
+    { label: "12hr", value: 43200 },
+    { label: "1day", value: 86400 },
   ];
   let ttlSelectedValue = ttlOptions[0].value;
   let recordSelectedZone = null;
   let createRecordValidationError = "";
   let createRecordModalOpen = false;
 
-  async function updateRecords(){
-    records = await getRecords( window );
+  async function updateRecords() {
+    records = await getRecords(window);
     records = records && records.data && records.data;
   }
 
-  async function updateTtl(){
-    if ( recordProxy ) {
+  async function updateTtl() {
+    if (recordProxy) {
       ttlSelectedValue = ttlOptions[0].value;
     }
   }
@@ -115,16 +122,24 @@
       createRecordValidationError = "All fields are required";
       return;
     } else {
-      const response = await insertRecord( window, recordName, recordSelectedZone, recordProxy, ttlSelectedValue );
-      
-      if ( response.status === 409 ) {
-        createRecordValidationError = "The record with the provided name already exists";
-        return
+      const response = await insertRecord(
+        window,
+        recordName,
+        recordSelectedZone,
+        recordProxy,
+        ttlSelectedValue,
+      );
+
+      if (response.status === 409) {
+        createRecordValidationError =
+          "The record with the provided name already exists";
+        return;
       }
 
-      if ( response.status === 404 ) {
-        createRecordValidationError = "(A) Record not found in your CloudFlare account";
-        return
+      if (response.status === 404) {
+        createRecordValidationError =
+          "(A) Record not found in your CloudFlare account";
+        return;
       }
 
       if (response && response.data) {
@@ -153,8 +168,8 @@
   let createZoneValidationError = "";
   let createZoneModalOpen = false;
 
-  async function updateZones(){
-    zones = await getZones( window );
+  async function updateZones() {
+    zones = await getZones(window);
     zones = zones && zones.data && zones.data;
     recordSelectedZone = zones && zones[0] ? zones[0].zoneId : null;
   }
@@ -172,16 +187,17 @@
       createZoneValidationError = "All fields are required";
       return;
     } else {
-      const response = await insertZone( window, zoneName, zoneId );
+      const response = await insertZone(window, zoneName, zoneId);
 
-      if ( response.status === 409 ) {
-        createZoneValidationError = "The zone with the provided 'name' or 'id' already exists";
-        return
+      if (response.status === 409) {
+        createZoneValidationError =
+          "The zone with the provided 'name' or 'id' already exists";
+        return;
       }
 
-      if ( response.status === 404 ) {
+      if (response.status === 404) {
         createZoneValidationError = "Zone not found in your CloudFlare account";
-        return
+        return;
       }
 
       if (response && response.data) {
@@ -202,55 +218,75 @@
   // FIN ZONES
 </script>
 
-<div style="display: flex; justify-content: center; margin-top: 70px;">
-  <Accordion style="width: 65vw;" theme={$darkMode ? "dark" : "light"}>
+<div class="container">
+  <Accordion
+    style="width: 100%; max-width: 70%;"
+    theme={$darkMode ? "dark" : "light"}
+  >
     {#if appStatus}
-    <Card body inverse={$darkMode} outline={false} color={$darkMode ? "dark" : "light"}>
-      <div style="display: flex; justify-content: space-between;">
-
-        <div>
-          <span style="opacity: 0.3;">Actual IP: </span>
-          <span>{appStatus && appStatus.externalIp}</span>
-        </div>
-
-        <div>
-          {#if !appStatus.isPaused}
-            <span style="opacity: 0.3;">Next check in: </span>
-            <span id="remainingTime-span">{appStatus && msToTime(appStatus.remainingTime)}</span>
-          {/if}
-
-          
-          {#if appStatus.isPaused}
-            <Button id="resume-button-tooltip" size="sm" outline color="secondary" on:click={handleTogglePause}>
-              <i class="bi bi-play-fill"></i>
+      <Card
+        body
+        inverse={$darkMode}
+        outline={false}
+        color={$darkMode ? "dark" : "light"}
+      >
+        <div
+          style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; align-items: center;"
+        >
+          <div style="flex: 1;">
+            <span style="opacity: 0.3;">Actual IP: </span>
+            <span>{appStatus && appStatus.externalIp}</span>
+          </div>
+          <div style="display: flex; gap: 5px; align-items: center;">
+            {#if !appStatus.isPaused}
+              <span style="opacity: 0.3;">Next check in: </span>
+              <span id="remainingTime-span"
+                >{appStatus && msToTime(appStatus.remainingTime)}</span
+              >
+            {/if}
+            <Button
+              id="pause-resume-button-tooltip"
+              size="sm"
+              outline
+              color="secondary"
+              on:click={handleTogglePause}
+            >
+              <i class="bi bi-{appStatus.isPaused ? 'play-fill' : 'pause-fill'}"
+              ></i>
             </Button>
-            <Tooltip target="resume-button-tooltip" placement="top">Start check interval <br/> (this forces an instant check)</Tooltip>
-          {:else}
-            <Button id="pause-button-tooltip" size="sm" outline color="secondary" on:click={handleTogglePause}>
-              <i class="bi bi-pause-fill"></i>
+            <Tooltip target="pause-resume-button-tooltip" placement="top">
+              {appStatus.isPaused
+                ? "Start check interval"
+                : "Pause check interval"}
+            </Tooltip>
+            <Button
+              id="force-button-tooltip"
+              size="sm"
+              outline
+              color="secondary"
+              on:click={handleForceCheck}
+            >
+              <i class="bi bi-arrow-right-circle"></i>
             </Button>
-            <Tooltip target="pause-button-tooltip" placement="top">Pause check interval</Tooltip>
-          {/if}
-
-          <Button id="force-button-tooltip" size="sm" outline color="secondary" on:click={handleForceCheck}>
-            <i class="bi bi-arrow-right-circle"></i>
-          </Button>
-          <Tooltip target="force-button-tooltip" placement="top">Force IP check</Tooltip>
-
+            <Tooltip target="force-button-tooltip" placement="top">Force IP check</Tooltip>
+          </div>
         </div>
-
-      </div>
-    </Card>    
+      </Card>
     {/if}
     <AccordionItem active={!zones || zones.length === 0}>
       <h4 class="m-0" slot="header">Zones</h4>
       <div class="accordion-content">
         {#if zones && zones.length > 0}
           {#each zones as zone, i}
-            <ZoneCard zone={zone} updateZones={updateZones} updateRecords={updateRecords} />
+            <ZoneCard {zone} {updateZones} {updateRecords} />
           {/each}
         {/if}
-        <Button outline color="primary" on:click={openCreateZoneModal} style="margin-top: 20px;">
+        <Button
+          outline
+          color="primary"
+          on:click={openCreateZoneModal}
+          style="margin-top: 20px;"
+        >
           <i style="font-size: x-large;" class="bi bi-plus"></i>
         </Button>
       </div>
@@ -261,10 +297,15 @@
         <div class="accordion-content">
           {#if records && records.length > 0}
             {#each records as record, i}
-              <RecordCard record={record} updateRecords={updateRecords} zones={zones} />
+              <RecordCard {record} {updateRecords} {zones} />
             {/each}
           {/if}
-          <Button outline color="primary" on:click={openCreateRecordModal} style="margin-top: 20px;">
+          <Button
+            outline
+            color="primary"
+            on:click={openCreateRecordModal}
+            style="margin-top: 20px;"
+          >
             <i style="font-size: x-large;" class="bi bi-plus"></i>
           </Button>
         </div>
@@ -273,9 +314,13 @@
   </Accordion>
 </div>
 
-
 <!-- MODAL CREATE ZONE -->
-<Modal bind:isOpen={createZoneModalOpen} onClose={closeCreateZoneModal} centered={true} dark={$darkMode}>
+<Modal
+  bind:isOpen={createZoneModalOpen}
+  onClose={closeCreateZoneModal}
+  centered={true}
+  dark={$darkMode}
+>
   <ModalHeader>Create new zone</ModalHeader>
   <ModalBody>
     {#if createZoneValidationError}
@@ -284,7 +329,9 @@
 
     <Label>Name</Label>
     <i id="zone-name-tooltip" class="bi bi-info-circle-fill"></i>
-    <Tooltip target="zone-name-tooltip" placement="top">This is only for identifying, you can really write whatever you want</Tooltip>
+    <Tooltip target="zone-name-tooltip" placement="top"
+      >This is only for identifying, you can really write whatever you want</Tooltip
+    >
     <Input
       theme={$darkMode ? "dark" : "light"}
       placeholder="Zone name (Example: borrageiros.com)"
@@ -296,8 +343,13 @@
     <br />
     <Label>ZoneId</Label>
     <i id="zoneId-tooltip" class="bi bi-info-circle-fill"></i>
-    <Tooltip target="zoneId-tooltip" placement="top">The zone id, you can find it in the CloudFlare interface</Tooltip>
-    <a href="https://developers.cloudflare.com/fundamentals/setup/find-account-and-zone-ids/" target="_blank">How to get zone ID</a>
+    <Tooltip target="zoneId-tooltip" placement="top"
+      >The zone id, you can find it in the CloudFlare interface</Tooltip
+    >
+    <a
+      href="https://developers.cloudflare.com/fundamentals/setup/find-account-and-zone-ids/"
+      target="_blank">How to get zone ID</a
+    >
     <Input
       theme={$darkMode ? "dark" : "light"}
       placeholder="Zone ID"
@@ -312,9 +364,13 @@
   </ModalFooter>
 </Modal>
 
-
 <!-- MODAL CREATE RECORD -->
-<Modal bind:isOpen={createRecordModalOpen} onClose={closeCreateRecordModal} centered={true} dark={$darkMode}>
+<Modal
+  bind:isOpen={createRecordModalOpen}
+  onClose={closeCreateRecordModal}
+  centered={true}
+  dark={$darkMode}
+>
   <ModalHeader>Create new record</ModalHeader>
   <ModalBody>
     {#if createRecordValidationError}
@@ -323,7 +379,9 @@
 
     <Label>Name</Label>
     <i id="record-name-tooltip" class="bi bi-info-circle-fill"></i>
-    <Tooltip target="record-name-tooltip" placement="top">This is exactly the full subdomain name (FQDN)</Tooltip>
+    <Tooltip target="record-name-tooltip" placement="top"
+      >This is exactly the full subdomain name (FQDN)</Tooltip
+    >
     <Input
       theme={$darkMode ? "dark" : "light"}
       placeholder="Record name (Example: ddns.borrageiros.com)"
@@ -335,8 +393,15 @@
     <br />
     <Label>Zone</Label>
     <i id="record-zone-tooltip" class="bi bi-info-circle-fill"></i>
-    <Tooltip target="record-zone-tooltip" placement="top">The domain to which the document belongs</Tooltip>
-    <Input theme={$darkMode ? "dark" : "light"} type="select" bind:value={recordSelectedZone} disabled={zones && zones.length === 1}>
+    <Tooltip target="record-zone-tooltip" placement="top"
+      >The domain to which the document belongs</Tooltip
+    >
+    <Input
+      theme={$darkMode ? "dark" : "light"}
+      type="select"
+      bind:value={recordSelectedZone}
+      disabled={zones && zones.length === 1}
+    >
       {#each zones as option}
         <option value={option.zoneId}>{option.name}</option>
       {/each}
@@ -346,7 +411,9 @@
     <i style="color: #f68a1d;" class="bi bi-cloud-fill"></i>
     <Label>CloudFlare proxy</Label>
     <i id="recordId-tooltip" class="bi bi-info-circle-fill"></i>
-    <Tooltip target="recordId-tooltip" placement="top">Do you want cloudflare to mask your IP?</Tooltip>
+    <Tooltip target="recordId-tooltip" placement="top"
+      >Do you want cloudflare to mask your IP?</Tooltip
+    >
     <Input
       bsSize="lg"
       type="switch"
@@ -358,8 +425,16 @@
     <br />
     <Label>TTL</Label>
     <i id="ttl-tooltip" class="bi bi-info-circle-fill"></i>
-    <Tooltip target="ttl-tooltip" placement="top">Time to live (TTL) refers to the amount of time or “hops” that a packet is set to exist inside a network before being discarded by a router.</Tooltip>
-    <Input theme={$darkMode ? "dark" : "light"} type="select" bind:value={ttlSelectedValue} disabled={recordProxy}>
+    <Tooltip target="ttl-tooltip" placement="top"
+      >Time to live (TTL) refers to the amount of time or “hops” that a packet
+      is set to exist inside a network before being discarded by a router.</Tooltip
+    >
+    <Input
+      theme={$darkMode ? "dark" : "light"}
+      type="select"
+      bind:value={ttlSelectedValue}
+      disabled={recordProxy}
+    >
       {#each ttlOptions as option}
         <option value={option.value}>{option.label}</option>
       {/each}
@@ -372,49 +447,56 @@
 </Modal>
 
 <style>
+  .container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    padding: 10px;
+  }
+
   .accordion-content {
     display: flex;
     flex-direction: column;
     align-items: center;
   }
 
-  :global(.accordion) {
-    background-color: var(--card-background);
-    border-color: var(--border-color);
+  @media (max-width: 768px) {
+    .container {
+      width: 100%;
+    }
+    :global(.accordion) {
+      max-width: 100% !important;
+      width: 100% !important;
+    }
+    .accordion-content {
+      width: 100%;
+      padding: 0 10px;
+    }
+    :global(.card) {
+      width: 100% !important;
+    }
+
+    span {
+      font-size: 0.9rem;
+    }
   }
 
-  :global(.accordion-item) {
-    background-color: var(--card-background);
-    border-color: var(--border-color);
-  }
+  @media (max-width: 480px) {
+    :global(.accordion) {
+      width: 100%;
+      padding: 5px;
+    }
 
-  :global(.accordion-button) {
-    background-color: var(--card-background);
-    color: var(--text-color);
-  }
+    :global(.modal-content) {
+      padding: 10px;
+    }
 
-  :global(.accordion-button:not(.collapsed)) {
-    background-color: var(--input-background);
-    color: var(--text-color);
-  }
+    span {
+      font-size: 0.8rem;
+    }
 
-  :global(.card) {
-    background-color: var(--card-background);
-    border-color: var(--border-color);
-  }
-
-  :global(.modal-content) {
-    background-color: var(--card-background);
-    color: var(--text-color);
-  }
-
-  :global(.form-control) {
-    background-color: var(--input-background);
-    color: var(--text-color);
-    border-color: var(--input-border);
-  }
-
-  :global(.accordion-button::after) {
-    filter: invert(var(--dark-mode-invert));
+    i {
+      font-size: 1rem;
+    }
   }
 </style>

@@ -49,11 +49,16 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    min-width: 0;
+    flex: 1;
   }
 
   .card-title, .card-text {
     margin: 0;
     padding: 0 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .card-title {
@@ -68,6 +73,7 @@
 
   .action {
     padding-left: 8px;
+    flex-shrink: 0;
   }
 
   i {
