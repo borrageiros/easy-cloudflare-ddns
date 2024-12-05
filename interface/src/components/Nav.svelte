@@ -21,6 +21,8 @@
   import { onMount } from "svelte";
   import { getConfig, insertConfig, updateConfig, generateApiToken } from "../api";
   import { copyText  } from 'svelte-copy';
+  import ThemeToggle from "./ThemeToggle.svelte";
+  import { darkMode } from '../theme';
 
   export let updateAppStatus;
 
@@ -163,37 +165,40 @@
   }
 </script>
 
-<Navbar dark expand="sm" container="sm" style="height: 100px;">
+<Navbar dark={$darkMode} expand="sm" container="sm" style="height: 100px;" theme={$darkMode ? "dark" : "light"}>
   <NavbarBrand href="/" style="font-size: 1.3rem;">
     Easy
     <i style="color: #f68a1d;" class="bi bi-cloud-fill">&nbsp;CloudFlare</i>
     DDNS
   </NavbarBrand>
   <Nav class="ms-auto" navbar>
-    <Dropdown direction="down">
-      <DropdownToggle nav caret style="font-size: 1.3rem; margin-left: 100px">
-        <i class="bi bi-gear" style="font-size: 1.3rem;" />
-      </DropdownToggle>
-      <DropdownMenu>
-        <DropdownItem on:click={openEditConfigModal} style="font-size: 1.3rem;">
-          <i class="bi bi-gear" />
-          Configuration
-        </DropdownItem>
-        <DropdownItem on:click={openGenerateApiKey} style="font-size: 1.3rem;">
-          <i class="bi bi-lock"></i>
-          Generate API KEY
-        </DropdownItem>
-        <DropdownItem class="text-danger" on:click={logOut} style="font-size: 1.3rem;">
-          <i class="bi bi-box-arrow-left" />
-          Log out
-        </DropdownItem>
-      </DropdownMenu>
-    </Dropdown>
+    <div class="d-flex align-items-center">
+      <ThemeToggle />
+      <Dropdown direction="down">
+        <DropdownToggle nav caret style="font-size: 1.3rem; margin-left: 20px">
+          <i class="bi bi-gear" style="font-size: 1.3rem;" />
+        </DropdownToggle>
+        <DropdownMenu dark={$darkMode}>
+          <DropdownItem on:click={openEditConfigModal} style="font-size: 1.3rem;">
+            <i class="bi bi-gear" />
+            Configuration
+          </DropdownItem>
+          <DropdownItem on:click={openGenerateApiKey} style="font-size: 1.3rem;">
+            <i class="bi bi-lock"></i>
+            Generate API KEY
+          </DropdownItem>
+          <DropdownItem class="text-danger" on:click={logOut} style="font-size: 1.3rem;">
+            <i class="bi bi-box-arrow-left" />
+            Log out
+          </DropdownItem>
+        </DropdownMenu>
+      </Dropdown>
+    </div>
   </Nav>
 </Navbar>
 
 <!-- MODAL CREATE CONFIG -->
-<Modal bind:isOpen={createConfigModalOpen} onClose={closeCreateConfigModal} centered={true}>
+<Modal bind:isOpen={createConfigModalOpen} onClose={closeCreateConfigModal} centered={true} {darkMode}>
   <ModalHeader>Initial configuration</ModalHeader>
   <ModalBody>
     {#if validationError}
@@ -239,7 +244,7 @@
 </Modal>
 
 <!-- MODAL EDIT CONFIG -->
-<Modal bind:isOpen={editConfigModalOpen} onClose={closeEditConfigModal} centered={true}>
+<Modal bind:isOpen={editConfigModalOpen} onClose={closeEditConfigModal} centered={true} {darkMode}>
   <ModalHeader>Configuration</ModalHeader>
   <ModalBody>
     {#if validationError}
@@ -288,7 +293,7 @@
 </Modal>
 
 <!-- MODAL GENERATE API KEY -->
-<Modal bind:isOpen={generateApiKeyModalOpen} onClose={closeGenerateApiKey} centered={true}>
+<Modal bind:isOpen={generateApiKeyModalOpen} onClose={closeGenerateApiKey} centered={true} {darkMode}>
   <ModalHeader>API KEY</ModalHeader>
   <ModalBody>
     {#if alertCopied}
@@ -308,4 +313,61 @@
 </Modal>
 
 <style>
+  :global(.navbar) {
+    background-color: var(--card-background) !important;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  :global(.navbar-brand) {
+    color: var(--text-color) !important;
+  }
+
+  :global(.dropdown-menu) {
+    background-color: var(--card-background) !important;
+    border-color: var(--border-color) !important;
+  }
+
+  :global(.dropdown-item) {
+    color: var(--text-color) !important;
+  }
+
+  :global(.dropdown-item:hover) {
+    background-color: var(--input-background) !important;
+  }
+
+  :global(.modal-content) {
+    background-color: var(--card-background) !important;
+    color: var(--text-color) !important;
+    border-color: var(--border-color) !important;
+  }
+
+  :global(.modal-header) {
+    border-bottom-color: var(--border-color) !important;
+  }
+
+  :global(.modal-footer) {
+    border-top-color: var(--border-color) !important;
+  }
+
+  :global(.form-control) {
+    background-color: var(--input-background) !important;
+    color: var(--text-color) !important;
+    border-color: var(--input-border) !important;
+  }
+
+  :global(.form-control:disabled) {
+    background-color: var(--input-background) !important;
+    color: var(--text-color) !important;
+    opacity: 0.8;
+  }
+
+  :global(textarea.form-control:disabled) {
+    color: var(--text-color) !important;
+    -webkit-text-fill-color: var(--text-color) !important;
+  }
+
+  :global(.form-control:focus) {
+    background-color: var(--input-background) !important;
+    color: var(--text-color) !important;
+  }
 </style>
