@@ -16,15 +16,21 @@
   }
 </script>
 
-<button class="dark-mode-toggle" on:click={toggleDarkMode} class:dark={$darkMode}>
-  <Tooltip target="dark-mode-toggle" placement="top">Toggle dark mode</Tooltip>
+<button id="dark-mode-toggle" 
+  class="dark-mode-toggle" 
+  on:click={toggleDarkMode} 
+  class:dark={$darkMode}>
   {#if $darkMode}
-    <Icon id="dark-mode-toggle" name="sun-fill" class="sun-icon" />
+    <Icon name="sun-fill" class="sun-icon" />
   {/if}
   {#if !$darkMode}
-    <Icon id="dark-mode-toggle" name="moon-fill" />
+    <Icon name="moon-fill" />
   {/if}
 </button>
+
+<Tooltip target="dark-mode-toggle" placement="top">
+  Toggle dark mode
+</Tooltip>
 
 <style>
   .dark-mode-toggle {
