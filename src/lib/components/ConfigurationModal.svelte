@@ -5,6 +5,7 @@
   import type { UserConfig } from '$lib/api';
   import Icon from '$lib/components/Icon.svelte';
   import { createEventDispatcher } from 'svelte';
+  import Loader from '$lib/components/Loader.svelte';
   
   export let open = false;
   
@@ -221,7 +222,7 @@
         disabled={saving || isVerifying || !email || !apiKey}
       >
         {#if isVerifying}
-          <span class="spinner"></span>
+          <Loader size="small" />
         {:else}
           <Icon name="check-circle" />
         {/if}
@@ -234,7 +235,7 @@
         disabled={saving || !email || !apiKey}
       >
         {#if saving}
-          <span class="spinner"></span>
+          <Loader size="small" />
         {:else}
           <Icon name="save" />
         {/if}
@@ -314,7 +315,7 @@
   
   .save-button {
     background-color: var(--principal-orange);
-    color: white;
+    color: var(--text-color);
   }
   
   .save-button:hover:not(:disabled) {
@@ -331,7 +332,7 @@
     padding: 8px;
     border: 1px solid var(--error-color);
     border-radius: 4px;
-    background-color: rgba(255, 0, 0, 0.05);
+    background-color: var(--background-color);
     font-size: 0.875rem;
   }
   
@@ -340,7 +341,7 @@
     padding: 8px;
     border: 1px solid var(--success-color);
     border-radius: 4px;
-    background-color: rgba(0, 255, 0, 0.05);
+    background-color: var(--background-color);
     font-size: 0.875rem;
   }
   
@@ -349,7 +350,7 @@
     padding: 8px;
     border: 1px solid var(--principal-blue);
     border-radius: 4px;
-    background-color: rgba(0, 0, 255, 0.05);
+    background-color: var(--background-color);
     font-size: 0.875rem;
     display: flex;
     align-items: center;
@@ -361,20 +362,7 @@
     align-items: center;
     gap: 8px;
   }
-  
-  .spinner {
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    border-top-color: currentColor;
-    animation: spin 1s ease-in-out infinite;
-  }
-  
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
+
   
   /* Responsive styles */
   @media (max-width: 640px) {

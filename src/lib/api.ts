@@ -159,7 +159,7 @@ export async function getServerStatus(): Promise<ServerStatusResponse | null> {
     
     return data;
   } catch (error) {
-    console.error('Error obteniendo configuración de usuario:', error);
+    console.error('Error getting server status:', error);
     return null;
   }
 }
@@ -290,10 +290,10 @@ export async function generateToken(rememberSession: boolean = false): Promise<L
       message: !response.ok ? data.message || data.error : undefined
     };
   } catch (error) {
-    console.error('Error durante el login:', error);
+    console.error('Error during login:', error);
     return {
       success: false,
-      message: 'Error de conexión'
+      message: 'Connection error'
     };
   }
 }
@@ -419,7 +419,7 @@ export async function getUserConfig(): Promise<UserConfig | null> {
     
     return data.data;
   } catch (error) {
-    console.error('Error obteniendo configuración de usuario:', error);
+    console.error('Error getting user configuration:', error);
     return null;
   }
 }
@@ -460,7 +460,7 @@ export async function createUserConfig(config: {
     
     return data.data;
   } catch (error) {
-    console.error('Error creando configuración de usuario:', error);
+    console.error('Error creating user configuration:', error);
     return null;
   }
 }
@@ -501,7 +501,7 @@ export async function updateUserConfig(updates: {
     
     return data.data;
   } catch (error) {
-    console.error('Error actualizando configuración de usuario:', error);
+    console.error('Error updating user configuration:', error);
     return null;
   }
 }

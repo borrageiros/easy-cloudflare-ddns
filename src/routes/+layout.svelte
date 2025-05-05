@@ -3,7 +3,7 @@
 	import { goto } from '$app/navigation';
 	import { browser } from '$app/environment';
 	import { isAuthenticated, validateToken } from '$lib/api';
-	import { initTheme } from '$lib/stores/theme';
+	import { initTheme, theme } from '$lib/stores/theme';
 	import Icon from '$lib/components/Icon.svelte';
 	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
 	import { page } from '$app/stores';
@@ -11,6 +11,7 @@
   import { clickOutside } from '$lib/actions/clickOutside';
   import TokenGenerator from '$lib/components/TokenGenerator.svelte';
   import ConfigurationModal from '$lib/components/ConfigurationModal.svelte';
+  import Loader from '$lib/components/Loader.svelte';
 	
 	import '$lib/styles/global.css';
 
@@ -30,6 +31,12 @@
   
   // State for configuration modal
   let configModalOpen = false;
+  
+  // Apply theme immediately
+  if (browser) {
+    // Apply theme before mounting
+    initTheme();
+  }
   
   function toggleSettingsMenu(event: MouseEvent) {
     event.stopPropagation();
@@ -60,9 +67,6 @@
   }
 
 	onMount(async () => {
-		// Initialize the theme
-		initTheme();
-		
 		// Check authentication
 		if (typeof window !== 'undefined') {
 			if (window.location.pathname !== '/login') {
@@ -81,7 +85,7 @@
 					return;
 				}
         
-        // Si ha llegado hasta aquí, está autenticado
+        // If weve reached this point, the user is authenticated
         isUserAuthenticated = true;
 			} else if (isAuthenticated()) {
 				// If on login page with valid token, redirect to home
@@ -93,14 +97,14 @@
 			}
 		}
     
-    // Cambiar el estado de carga cuando termine la verificación
+    // Change the loading state when verification is complete
     layoutLoading = false;
 	});
 </script>
 
 {#if layoutLoading && !isLoginPage}
-  <div class="layout-loading">
-    <span class="spinner-large"></span>
+  <div class="layout-loading" class:dark-loading={$theme === 'dark'}>
+    <Loader size="large" dark={$theme === 'dark'} />
     <p>Loading...</p>
   </div>
 {:else}
@@ -134,10 +138,7 @@
                 exclude: settingsButton 
               }}>
                 <div class="settings-item">
-                  <span class="theme-toggle-container">
-                    <Icon name="grid" />
-                    <ThemeToggle />
-                  </span>
+                  <ThemeToggle />
                 </div>
                 <div class="settings-item">
                   <button class="settings-button" on:click={openConfigModal}>
@@ -209,23 +210,15 @@
     left: 0;
     background-color: var(--background-color);
     z-index: 9999;
+    color: var(--text-color);
   }
   
-  .spinner-large {
-    display: inline-block;
-    width: 50px;
-    height: 50px;
-    border: 3px solid rgba(128, 128, 128, 0.3);
-    border-radius: 50%;
-    border-top-color: var(--principal-orange);
-    animation: spin 1s ease-in-out infinite;
-    margin-bottom: 16px;
+  /* Explicit styles for dark theme loading */
+  .dark-loading {
+    background-color: #1a1a1a;
+    color: #f0f0f0;
   }
   
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
-
   .app-container {
     display: flex;
     flex-direction: column;
@@ -353,13 +346,6 @@
     z-index: 100;
     border: 1px solid var(--border-color);
     overflow: hidden;
-  }
-
-  .theme-toggle-container {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding-left: 0.75rem;
   }
 
   

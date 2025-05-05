@@ -4,6 +4,7 @@
   import type { CloudFlareZone, DnsZone } from '$lib/api';
   import Icon from '$lib/components/Icon.svelte';
   import { createEventDispatcher } from 'svelte';
+  import Loader from '$lib/components/Loader.svelte';
   
   export let open = false;
   
@@ -103,7 +104,7 @@
         success = `Zone "${selectedZone.name}" saved successfully`;
         dispatch('zoneAdded', savedZone);
         
-        // Actualizar las listas de zonas después de guardar
+        // Update zone lists after saving
         databaseZones = [...databaseZones, savedZone];
         filteredZones = filteredZones.filter(zone => zone.id !== selectedZone?.id);
         selectedZone = filteredZones.length > 0 ? filteredZones[0] : null;
@@ -143,7 +144,7 @@
     
     {#if loading}
       <div class="loading-indicator">
-        <span class="spinner"></span>
+        <Loader size="small" />
         <span>Loading zones...</span>
       </div>
     {:else if filteredZones.length === 0}
@@ -189,7 +190,7 @@
         disabled={loading || saving}
       >
         {#if loading}
-          <span class="spinner"></span>
+          <Loader size="small" />
         {:else}
           <Icon name="refresh-cw" />
         {/if}
@@ -203,7 +204,7 @@
           disabled={loading || saving || !selectedZone}
         >
           {#if saving}
-            <span class="spinner"></span>
+            <Loader size="small" />
           {:else}
             <Icon name="save" />
           {/if}
@@ -235,7 +236,7 @@
     padding: 8px;
     border: 1px solid var(--error-color);
     border-radius: 4px;
-    background-color: rgba(255, 0, 0, 0.05);
+    background-color: rgba(var(--error-color-rgb), 0.05);
     font-size: 0.875rem;
   }
   
@@ -244,7 +245,7 @@
     padding: 8px;
     border: 1px solid var(--success-color);
     border-radius: 4px;
-    background-color: rgba(0, 255, 0, 0.05);
+    background-color: rgba(var(--success-color-rgb), 0.05);
     font-size: 0.875rem;
   }
   
@@ -351,7 +352,7 @@
   
   .refresh-button {
     background-color: var(--principal-blue);
-    color: white;
+    color: var(--text-color);
   }
   
   .refresh-button:hover:not(:disabled) {
@@ -360,7 +361,7 @@
   
   .save-button {
     background-color: var(--principal-orange);
-    color: white;
+    color: var(--text-color);
   }
   
   .save-button:hover:not(:disabled) {
@@ -380,16 +381,6 @@
   button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-  }
-  
-  .spinner {
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    border-top-color: currentColor;
-    animation: spin 1s ease-in-out infinite;
   }
   
   @keyframes spin {

@@ -9,6 +9,7 @@
   import { getZones, deleteZone, getRecords, getServerStatus, toggleInterval, forceInterval, getUserConfig, isAuthenticated } from "$lib/api";
   import type { DnsZone, DnsRecord, ServerStatusResponse } from "$lib/api";
   import { browser } from '$app/environment';
+  import Loader from '$lib/components/Loader.svelte';
   
   // Initial loading state to avoid flashing
   let initialLoading = true;
@@ -269,14 +270,14 @@
   
   onMount(async () => {
     if (browser) {
-      // Verificar si el usuario está autenticado
+      // Check if user is authenticated
       const authenticated = await isAuthenticated();
       if (!authenticated) {
         window.location.href = '/login';
         return;
       }
       
-      // Cargar los datos iniciales
+      // Load initial data
       await Promise.all([
         loadZones(),
         loadRecords(),
@@ -284,7 +285,7 @@
         checkUserConfig()
       ]);
       
-      // Cambiar el estado de carga inicial
+      // Change initial loading state
       initialLoading = false;
     }
   });
@@ -330,6 +331,13 @@
     
     records = records.filter(record => record.id !== deletedRecord.id);
     filterRecords();
+  }
+
+  function handleZoneDeleted(event: CustomEvent) {
+    const deletedZone = event.detail;
+    
+    zones = zones.filter(zone => zone.id !== deletedZone.id);
+    filterZones();
   }
 
   function handleOpenZonesModal() {
@@ -386,8 +394,8 @@
 </svelte:head>
 
 {#if initialLoading}
-  <div class="initial-loading">
-    <span class="spinner-large"></span>
+  <div class="initial-loading" class:dark-loading={document.documentElement.classList.contains('dark-theme')}>
+    <Loader size="large" />
     <p>Loading data...</p>
   </div>
 {:else}
@@ -421,7 +429,7 @@
                   disabled={togglingInterval}
                 >
                   {#if togglingInterval}
-                    <span class="spinner-small white"></span>
+                    <Loader size="small" color="white" />
                   {:else}
                     <Icon name={serverStatus.data.isIntervalPaused ? 'play' : 'pause'} />
                   {/if}
@@ -441,7 +449,7 @@
           </div>
         {:else}
           <div class="loading-indicator">
-            <span class="spinner"></span>
+            <Loader size="small" />
             <span>Loading server status...</span>
           </div>
         {/if}
@@ -458,7 +466,7 @@
         bind:zoneSearchQuery={zoneSearchQuery}
         on:openZonesModal={handleOpenZonesModal}
         on:filterZones={handleZoneSearchChange}
-        on:zoneDeleted={handleZoneAdded}
+        on:zoneDeleted={handleZoneDeleted}
       />
       
       <RecordsTable 
@@ -512,18 +520,7 @@
     justify-content: center;
     min-height: 300px;
     width: 100%;
-    color: var(--text-color-secondary);
-  }
-  
-  .spinner-large {
-    display: inline-block;
-    width: 40px;
-    height: 40px;
-    border: 3px solid rgba(var(--text-color-rgb), 0.3);
-    border-radius: 50%;
-    border-top-color: var(--principal-orange);
-    animation: spin 1s ease-in-out infinite;
-    margin-bottom: 1rem;
+    color: var(--text-color);
   }
   
   .header-section {
@@ -590,12 +587,12 @@
   }
   
   .start-button {
-    background-color: var(--success-color);
-    color: white;
+    background-color: var(--principal-orange);
+    color: var(--text-color);
   }
   
   .start-button:hover:not(:disabled) {
-    background-color: var(--success-color-dark);
+    background-color: var(--principal-orange-dark);
   }
   
   .pause-button {
@@ -613,7 +610,7 @@
   
   .force-button {
     background-color: var(--principal-blue);
-    color: white;
+    color: var(--text-color);
   }
   
   .force-button:hover:not(:disabled) {
@@ -654,18 +651,14 @@
     font-family: monospace;
   }
   
-  .spinner-small {
-    display: inline-block;
-    width: 14px;
-    height: 14px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    border-top-color: white;
-    animation: spin 1s ease-in-out infinite;
-  }
-  
-  @keyframes spin {
-    to { transform: rotate(360deg); }
+  .loading-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    width: 100%;
+    color: var(--text-color);
   }
   
   /* Responsive design */

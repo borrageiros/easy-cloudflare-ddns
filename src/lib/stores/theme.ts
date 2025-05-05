@@ -1,13 +1,24 @@
 import { writable } from 'svelte/store';
 import { browser } from '$app/environment';
 
-type Theme = 'light' | 'dark' | 'system';
+type Theme = 'light' | 'dark';
 
-// Initialize with the saved theme in localStorage or 'system' by default
-const storedTheme = browser ? localStorage.getItem('theme') as Theme || 'system' : 'system';
+// Determine the initial theme based on system preference or stored preference
+function getInitialTheme(): Theme {
+  if (!browser) return 'light';
+  
+  // Check if there is a saved theme
+  const storedTheme = localStorage.getItem('theme') as Theme;
+  if (storedTheme === 'light' || storedTheme === 'dark') {
+    return storedTheme;
+  }
+  
+  // If there is no saved theme or it is invalid, use the system preference
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
 
-// Create the store
-export const theme = writable<Theme>(storedTheme);
+// Create the store with the initial theme
+export const theme = writable<Theme>(getInitialTheme());
 
 // Apply the theme when the page loads
 export function initTheme(): void {
@@ -23,37 +34,24 @@ export function initTheme(): void {
       // Remove existing theme classes
       root.classList.remove('light-theme', 'dark-theme');
       
-      if (value === 'system') {
-        // Use the system preference
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        root.classList.add(prefersDark ? 'dark-theme' : 'light-theme');
-      } else {
-        // Use the selected theme manually
-        root.classList.add(`${value}-theme`);
-      }
+      // Apply the selected theme
+      root.classList.add(`${value}-theme`);
     });
     
     // Observe changes in system preferences
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     
-    mediaQuery.addEventListener('change', () => {
-      // If configured in "system", update when the system preference changes
-      theme.update(current => {
-        if (current === 'system') {
-          // Force update to apply changes
-          return 'system';
-        }
-        return current;
-      });
+    mediaQuery.addEventListener('change', (e) => {
+      // If there is no saved theme or the storage was removed, update according to the system
+      const storedTheme = localStorage.getItem('theme');
+      if (!storedTheme) {
+        theme.set(e.matches ? 'dark' : 'light');
+      }
     });
   }
 }
 
 // Change theme
 export function toggleTheme(): void {
-  theme.update(current => {
-    if (current === 'light') return 'dark';
-    if (current === 'dark') return 'system';
-    return 'light';
-  });
+  theme.update(current => current === 'light' ? 'dark' : 'light');
 } 

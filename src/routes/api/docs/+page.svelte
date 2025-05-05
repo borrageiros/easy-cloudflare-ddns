@@ -20,33 +20,21 @@
       }
     });
 
-    // Detectar el tema real que se aplica cuando está en "system"
+    // Detect the actual theme that is applied
     if (typeof window !== 'undefined') {
-      // Determinar si el tema del sistema es oscuro
+      // Determine if the system theme is dark
       const systemIsDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       
-      // Actualizar la clase cuando cambie el tema
+      // Update the class when the theme changes
       const updateThemeClass = () => {
-        if ($theme === 'system') {
-          currentThemeClass = systemIsDark ? 'dark-theme' : 'light-theme';
-        } else {
-          currentThemeClass = `${$theme}-theme`;
-        }
+        currentThemeClass = `${$theme}-theme`;
       };
       
-      // Inicializar
+      // Initialize
       updateThemeClass();
       
-      // Suscribirse a cambios en el tema
+      // Subscribe to theme changes
       theme.subscribe(updateThemeClass);
-      
-      // Observar cambios en las preferencias del sistema
-      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      mediaQuery.addEventListener('change', (e) => {
-        if ($theme === 'system') {
-          currentThemeClass = e.matches ? 'dark-theme' : 'light-theme';
-        }
-      });
     }
   });
 </script>
@@ -95,7 +83,7 @@
     overflow: auto;
   }
   
-  /* Estilos específicos para theme claro */
+  /* Specific styles for light theme */
   .light-theme :global(.swagger-ui) {
     color: #333;
   }
@@ -125,7 +113,7 @@
     background-color: var(--primary-hover);
   }
   
-  /* Estilos específicos para theme oscuro */
+  /* Specific styles for dark theme */
   .dark-theme :global(body) {
     background-color: var(--background-color);
   }

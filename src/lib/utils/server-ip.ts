@@ -1,9 +1,31 @@
 /**
+ * Cache system for external IP
+ */
+interface IpCache {
+  value: string | null;
+  timestamp: number;
+  expiresIn: number; // milliseconds
+}
+
+// Initialize the cache
+const ipCache: IpCache = {
+  value: null,
+  timestamp: 0,
+  expiresIn: 5 * 60 * 1000 // Default: 5 minutes
+};
+
+/**
  * Get the external IP address of the server
  * This function is intended to be called from the server-side API endpoints
  * @returns Promise with the external IP address as a string
  */
 export async function getServerExternalIp(): Promise<string> {
+  // Check if we have a valid cached value
+  const now = Date.now();
+  if (ipCache.value && (now - ipCache.timestamp) < ipCache.expiresIn) {
+    return ipCache.value;
+  }
+
   try {
     // Try multiple IP lookup services for redundancy
     const services = [
@@ -36,12 +58,18 @@ export async function getServerExternalIp(): Promise<string> {
           // Different services might have different response formats
           const ip = data.ip || data.ipAddress || data.address;
           if (ip && typeof ip === 'string' && isValidIp(ip)) {
-            return ip.trim();
+            // Update cache
+            ipCache.value = ip.trim();
+            ipCache.timestamp = now;
+            return ipCache.value;
           }
         } else {
           const ip = await response.text();
           if (isValidIp(ip)) {
-            return ip.trim();
+            // Update cache
+            ipCache.value = ip.trim();
+            ipCache.timestamp = now;
+            return ipCache.value;
           }
         }
       } catch (innerError) {
@@ -55,6 +83,24 @@ export async function getServerExternalIp(): Promise<string> {
   } catch (error) {
     console.error('Error getting server external IP:', error);
     throw new Error('Failed to determine server external IP');
+  }
+}
+
+/**
+ * Manually invalidate the IP cache to force a refresh on next call
+ */
+export function invalidateIpCache(): void {
+  ipCache.value = null;
+  ipCache.timestamp = 0;
+}
+
+/**
+ * Update the cache expiration time
+ * @param seconds - The cache expiration time in seconds
+ */
+export function setIpCacheExpiration(seconds: number): void {
+  if (seconds > 0) {
+    ipCache.expiresIn = seconds * 1000;
   }
 }
 

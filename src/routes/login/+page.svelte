@@ -5,6 +5,8 @@
   import Icon from '$lib/components/Icon.svelte';
   import { onMount } from 'svelte';
   import { browser } from '$app/environment';
+  import { page } from '$app/stores';
+  import Loader from '$lib/components/Loader.svelte';
   
   let password: string = '';
   let rememberSession: boolean = false;
@@ -46,7 +48,7 @@
         if (browser) {
           window.location.href = '/';
         } else {
-          goto('/');
+        goto('/');
         }
         return;
       } else {
@@ -63,61 +65,61 @@
 
 {#if pageReady}
   <div class="login-page" transition:fade={{ duration: 200 }}>
-    <div class="login-wrapper">
-      <div class="login-container card" transition:fade={{ duration: 300 }}>
-        <div class="login-header">
-          <h1 class="login-title">
-            Easy
-            <a href="https://www.cloudflare.com" target="_blank">
-              <span class="cloud-flare">
-                <Icon name="cloud" />
-                CloudFlare
-              </span>
-            </a>
-            DDNS
-          </h1>
-        </div>
-        
-        <form on:submit|preventDefault={handleLogin}>
-          <div class="form-content">
-            <div class="form-group">
-              <input 
-                type="password" 
-                id="password" 
-                bind:value={password} 
-                bind:this={passwordInput}
-                disabled={isLoading}
-                required
-                placeholder="Password"
-              />
-            </div>
-            
-            <div class="form-group remember-me">
-              <label for="remember">
-                <input 
-                  type="checkbox" 
-                  id="remember" 
-                  bind:checked={rememberSession}
-                />
-                <span>Keep session logged in</span>
-              </label>
-            </div>
-            
-            {#if error}
-              <div class="error" transition:fade={{ duration: 200 }}>{error}</div>
-            {/if}
-            
-            <button type="submit" class="login-button" disabled={isLoading}>
-              {isLoading ? 'Processing...' : 'Login'}
-            </button>
-          </div>
-        </form>
+  <div class="login-wrapper">
+    <div class="login-container card" transition:fade={{ duration: 300 }}>
+      <div class="login-header">
+        <h1 class="login-title">
+          Easy
+          <a href="https://www.cloudflare.com" target="_blank">
+            <span class="cloud-flare">
+              <Icon name="cloud" />
+              CloudFlare
+            </span>
+          </a>
+          DDNS
+        </h1>
       </div>
+      
+      <form on:submit|preventDefault={handleLogin}>
+        <div class="form-content">
+          <div class="form-group">
+            <input 
+              type="password" 
+              id="password" 
+              bind:value={password} 
+                bind:this={passwordInput}
+              disabled={isLoading}
+              required
+              placeholder="Password"
+            />
+          </div>
+          
+          <div class="form-group remember-me">
+            <label for="remember">
+              <input 
+                type="checkbox" 
+                id="remember" 
+                bind:checked={rememberSession}
+              />
+              <span>Keep session logged in</span>
+            </label>
+          </div>
+          
+          {#if error}
+            <div class="error" transition:fade={{ duration: 200 }}>{error}</div>
+          {/if}
+          
+          <button type="submit" class="login-button" disabled={isLoading}>
+            {isLoading ? 'Processing...' : 'Login'}
+          </button>
+        </div>
+      </form>
     </div>
   </div>
+</div>
 {:else}
   <div class="login-loading">
-    <span class="spinner-large"></span>
+    <Loader size="large" />
   </div>
 {/if}
 
@@ -130,28 +132,14 @@
     width: 100%;
   }
   
-  .spinner-large {
-    display: inline-block;
-    width: 50px;
-    height: 50px;
-    border: 3px solid rgba(128, 128, 128, 0.3);
-    border-radius: 50%;
-    border-top-color: var(--principal-orange);
-    animation: spin 1s ease-in-out infinite;
-  }
-  
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
-
   .login-page {
     height: 100vh;
     width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #222;
-    background: linear-gradient(145deg, #1a1a1a 0%, #2d2d2d 100%);
+    background-color: var(--background-color);
+    background: linear-gradient(145deg, var(--background-color) 0%, var(--background-color) 100%);
   }
 
   .login-wrapper {
@@ -165,7 +153,7 @@
     width: 100%;
     max-width: 400px;
     padding: 0;
-    background-color: #2d2d2d;
+    background-color: var(--background-color);
     border-radius: 5px;
     border-top: 2px solid var(--primary-color);
     border-bottom: 2px solid var(--secondary-color);
@@ -174,16 +162,16 @@
   }
   
   .login-header {
-    background-color: #232323;
+    background-color: var(--background-color);
     padding: 16px 24px;
-    border-bottom: 1px solid #3a3a3a;
+    border-bottom: 1px solid var(--border-color);
   }
   
   .login-title {
     text-align: center;
     margin: 0;
     font-size: 24px;
-    color: white;
+    color: var(--text-color);
     font-weight: 500;
     letter-spacing: 1px;
     line-height: 1.4;
@@ -230,9 +218,9 @@
   input {
     width: 100%;
     padding: 12px;
-    background-color: #1a1a1a;
-    color: white;
-    border: 1px solid #3a3a3a;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
     border-radius: 4px;
     font-size: 16px;
     text-align: center;
@@ -241,13 +229,13 @@
   }
   
   input::placeholder {
-    color: rgba(255, 255, 255, 0.3);
+    color: rgba(var(--text-color-rgb), 0.3);
   }
   
   input:focus {
     border-color: var(--primary-color);
     outline: none;
-    box-shadow: 0 0 0 2px rgba(246, 130, 31, 0.2);
+    box-shadow: 0 0 0 2px rgba(var(--principal-orange-rgb), 0.2);
   }
   
   input:disabled {
@@ -269,7 +257,7 @@
     max-width: 300px;
     padding: 12px;
     background-color: var(--primary-color);
-    color: white;
+    color: var(--text-color);
     font-size: 16px;
     font-weight: 500;
     border: none;

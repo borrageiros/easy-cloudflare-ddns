@@ -2,6 +2,7 @@
   /* Light theme (default) */
   --background-color: #ffffff;
   --text-color: #333333;
+  --text-color-rgb: 51, 51, 51;
   --primary-color: #F6821F;
   --primary-hover: #e67616;
   --secondary-color: #2C7CB0;
@@ -10,8 +11,10 @@
   --border-color: #dddddd;
   --card-bg: #f9f9f9;
   --error-color: #f44336;
+  --error-color-rgb: 244, 67, 54;
   --error-color-dark: #c62828;
   --success-color: #4CAF50;
+  --success-color-rgb: 76, 175, 80;
   --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   --header-bg: #f5f5f5;
   --footer-bg: #f5f5f5;
@@ -28,6 +31,7 @@
   :root {
     --background-color: #1a1a1a;
     --text-color: #f0f0f0;
+    --text-color-rgb: 240, 240, 240;
     --primary-color: #F6821F; 
     --primary-hover: #ff9642;
     --secondary-color: #4095d0;
@@ -36,8 +40,10 @@
     --border-color: #444444;
     --card-bg: #2d2d2d;
     --error-color: #ef5350;
+    --error-color-rgb: 239, 83, 80;
     --error-color-dark: #c62828;
     --success-color: #66bb6a;
+    --success-color-rgb: 102, 187, 106;
     --shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
     --header-bg: #2d2d2d;
     --footer-bg: #2d2d2d;
@@ -54,6 +60,7 @@
 .light-theme {
   --background-color: #ffffff;
   --text-color: #333333;
+  --text-color-rgb: 51, 51, 51;
   --primary-color: #F6821F;
   --primary-hover: #e67616;
   --secondary-color: #2C7CB0;
@@ -62,8 +69,10 @@
   --border-color: #dddddd;
   --card-bg: #f9f9f9;
   --error-color: #f44336;
+  --error-color-rgb: 244, 67, 54;
   --error-color-dark: #c62828;
   --success-color: #4CAF50;
+  --success-color-rgb: 76, 175, 80;
   --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   --header-bg: #f5f5f5;
   --footer-bg: #f5f5f5;
@@ -78,6 +87,7 @@
 .dark-theme {
   --background-color: #1a1a1a;
   --text-color: #f0f0f0;
+  --text-color-rgb: 240, 240, 240;
   --primary-color: #F6821F;
   --primary-hover: #ff9642;
   --secondary-color: #4095d0;
@@ -86,8 +96,10 @@
   --border-color: #444444;
   --card-bg: #2d2d2d;
   --error-color: #ef5350;
+  --error-color-rgb: 239, 83, 80;
   --error-color-dark: #c62828;
   --success-color: #66bb6a;
+  --success-color-rgb: 102, 187, 106;
   --shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
   --header-bg: #2d2d2d;
   --footer-bg: #2d2d2d;
@@ -136,7 +148,7 @@ a:hover {
 
 button {
   background-color: var(--primary-color);
-  color: white;
+  color: var(--text-color);
   border: none;
   padding: 8px 16px;
   border-radius: 4px;

@@ -2,6 +2,7 @@
   import Icon from "$lib/components/Icon.svelte";
   import type { DnsRecord } from "$lib/api";
   import { createEventDispatcher } from "svelte";
+  import Loader from "$lib/components/Loader.svelte";
   
   export let records: DnsRecord[] = [];
   export let filteredRecords: DnsRecord[] = [];
@@ -54,7 +55,7 @@
   
   {#if loading}
     <div class="loading-indicator">
-      <span class="spinner"></span>
+      <Loader size="small" />
       <span>Loading records...</span>
     </div>
   {:else if records.length === 0}
@@ -150,18 +151,23 @@
     font-size: 1.25rem;
     font-weight: 600;
     color: var(--text-color);
+    min-width: 80px;
   }
   
   .actions {
     display: flex;
     gap: 0.5rem;
     align-items: center;
+    flex: 1;
+    justify-content: flex-end;
   }
   
   .search-container {
     position: relative;
     display: flex;
     align-items: center;
+    margin-right: auto;
+    width: 100%;
   }
   
   .search-container input {
@@ -208,7 +214,7 @@
     gap: 0.5rem;
     padding: 0.5rem 0.75rem;
     background-color: var(--principal-orange);
-    color: white;
+    color: var(--text-color);
     border: none;
     border-radius: 0.25rem;
     cursor: pointer;
@@ -235,16 +241,6 @@
     gap: 0.5rem;
     padding: 1rem 0;
     color: var(--text-color-secondary);
-  }
-  
-  .spinner {
-    display: inline-block;
-    width: 1rem;
-    height: 1rem;
-    border: 2px solid rgba(var(--text-color-rgb), 0.3);
-    border-radius: 50%;
-    border-top-color: var(--principal-orange);
-    animation: spin 0.8s linear infinite;
   }
   
   @keyframes spin {
@@ -378,6 +374,7 @@
     
     .search-container {
       flex: 1;
+      margin-right: 0;
     }
     
     .search-container input {

@@ -1,5 +1,5 @@
 import { getRecords, getUserConfig, updateUserConfig, updateRecord as updateRecordFileDb } from "$lib/db/fileDb";
-import { getServerExternalIp } from "./server-ip";
+import { getServerExternalIp, setIpCacheExpiration, invalidateIpCache } from "./server-ip";
 import { updateRecord as updateRecordCloudflare } from "./cloudflare";
 
 let intervalId: ReturnType<typeof setInterval> | null = null;
@@ -8,6 +8,8 @@ let nextCheckTime = 0;
 let intervalSeconds = 300;
 
 async function executeTask() {
+  // Invalidate the IP cache to force a real check when the interval is up
+  invalidateIpCache();
   const externalIp = await getServerExternalIp();
   const config = await getUserConfig();
 
@@ -18,7 +20,6 @@ async function executeTask() {
   }
 
   if (config.lastIp !== externalIp) {
-    console.log(`IP changed from ${config.lastIp} to ${externalIp}`);
 
     const records = await getRecords();
     for (const record of records) {
@@ -45,6 +46,9 @@ export async function initializeInterval() {
   const config = await getUserConfig();
   intervalSeconds = config?.checkInterval || 300;
   
+  // Synchronize IP cache expiration with the check interval
+  setIpCacheExpiration(intervalSeconds);
+  
   startInterval(intervalSeconds);
   
   return {
@@ -61,28 +65,29 @@ function startInterval(seconds: number) {
   const milliseconds = seconds * 1000;
   nextCheckTime = Date.now() + milliseconds;
   
+  // Update IP cache expiration to match the interval
+  setIpCacheExpiration(seconds);
+  
   intervalId = setInterval(() => {
     if (!isPaused) {
       executeTask();
       nextCheckTime = Date.now() + milliseconds;
     }
   }, milliseconds);
-  
-  console.log(`Interval started with ${seconds} seconds`);
 }
 
 export function forceExecution() {
   if (intervalId) {
+    // Invalidate the IP cache to force a real check on manual execution
+    invalidateIpCache();
     executeTask();
     
     if (!isPaused) {
       const milliseconds = intervalSeconds * 1000;
       nextCheckTime = Date.now() + milliseconds;
       
-      console.log(`Task forced execution. Next check in ${intervalSeconds} seconds`);
       return true;
     } else {
-      console.log("Task forced execution (interval remains paused)");
       return true;
     }
   }
@@ -92,7 +97,6 @@ export function forceExecution() {
 export function pauseInterval() {
   if (!isPaused && intervalId) {
     isPaused = true;
-    console.log("Interval paused");
     return true;
   }
   return false;
@@ -101,7 +105,6 @@ export function pauseInterval() {
 export function resumeInterval() {
   if (isPaused && intervalId) {
     isPaused = false;
-    console.log("Interval resumed");
     return true;
   }
   return false;

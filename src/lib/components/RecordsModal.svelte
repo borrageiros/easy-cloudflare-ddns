@@ -4,6 +4,7 @@
   import type { DnsZone, DnsRecord, CloudFlareDnsRecord } from '$lib/api';
   import Icon from '$lib/components/Icon.svelte';
   import { createEventDispatcher } from 'svelte';
+  import Loader from '$lib/components/Loader.svelte';
   
   export let open = false;
   export let editMode = false;
@@ -368,7 +369,7 @@
     
     {#if loading}
       <div class="loading-indicator">
-        <span class="spinner"></span>
+        <Loader size="small" />
         <span>Loading...</span>
       </div>
     {:else}
@@ -478,7 +479,7 @@
           disabled={loading || saving || deleting}
         >
           {#if deleting}
-            <span class="spinner"></span>
+            <Loader size="small" />
           {:else}
             <Icon name="trash" />
           {/if}
@@ -493,7 +494,7 @@
           disabled={loading || saving || deleting || (!editMode && (!selectedRecord || !selectedZone))}
         >
           {#if saving}
-            <span class="spinner"></span>
+            <Loader size="small" />
           {:else}
             <Icon name="save" />
           {/if}
@@ -525,7 +526,7 @@
     padding: 8px;
     border: 1px solid var(--error-color);
     border-radius: 4px;
-    background-color: rgba(255, 0, 0, 0.05);
+    background-color: rgba(var(--error-color-rgb), 0.05);
     font-size: 0.875rem;
   }
   
@@ -534,7 +535,7 @@
     padding: 8px;
     border: 1px solid var(--success-color);
     border-radius: 4px;
-    background-color: rgba(0, 255, 0, 0.05);
+    background-color: rgba(var(--success-color-rgb), 0.05);
     font-size: 0.875rem;
   }
   
@@ -697,7 +698,7 @@
   
   .save-button {
     background-color: var(--principal-orange);
-    color: white;
+    color: var(--text-color);
   }
   
   .save-button:hover:not(:disabled) {
@@ -716,7 +717,7 @@
   
   .delete-button {
     background-color: var(--error-color);
-    color: white;
+    color: var(--text-color);
   }
   
   .delete-button:hover:not(:disabled) {
@@ -726,16 +727,6 @@
   button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-  }
-  
-  .spinner {
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    border-top-color: currentColor;
-    animation: spin 1s ease-in-out infinite;
   }
   
   @keyframes spin {

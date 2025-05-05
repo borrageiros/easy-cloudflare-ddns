@@ -3,6 +3,7 @@
   import Modal from '$lib/components/Modal.svelte';
   import { generateToken } from '$lib/api';
   import Icon from '$lib/components/Icon.svelte';
+  import Loader from '$lib/components/Loader.svelte';
   
   export let open = false;
   
@@ -76,7 +77,7 @@
     
     {#if generating}
       <div class="generating-indicator">
-        <span class="spinner"></span>
+        <Loader size="small" />
         <span>Generating token...</span>
       </div>
     {/if}
@@ -140,20 +141,6 @@
     font-size: 0.875rem;
   }
   
-  .spinner {
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    border: 2px solid rgba(128, 128, 128, 0.3);
-    border-radius: 50%;
-    border-top-color: var(--principal-orange);
-    animation: spin 1s ease-in-out infinite;
-  }
-  
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
-  
   .token-result {
     border: 1px solid var(--border-color);
     border-radius: 4px;
@@ -215,7 +202,7 @@
     padding: 8px;
     border: 1px solid var(--error-color);
     border-radius: 4px;
-    background-color: rgba(255, 0, 0, 0.05);
+    background-color: rgba(var(--error-color-rgb), 0.05);
   }
   
   /* Responsive styles */
