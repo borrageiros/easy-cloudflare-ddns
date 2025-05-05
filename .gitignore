@@ -26,3 +26,6 @@ vite.config.ts.timestamp-*
 
 data/database.json
 data/jwt-secret
+
+.svelte-kit
+build
