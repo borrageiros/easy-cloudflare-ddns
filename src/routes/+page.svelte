@@ -398,6 +398,22 @@
           <div class="status-section">
             <div class="status-header">
               <h3>Status</h3>
+              <div class="status-info">
+                <div class="status-item">
+                  <span class="status-label">Public IP:</span>
+                  <span class="status-value">{serverStatus.data.externalIp || 'Unknown'}</span>
+                </div>
+                <div class="status-item">
+                  <span class="status-label">Next Check:</span>
+                  <span class="status-value countdown">
+                    {#if serverStatus.data.isIntervalPaused}
+                      Paused
+                    {:else}
+                      {Math.floor(countdownSeconds / 60)}:{(countdownSeconds % 60).toString().padStart(2, '0')}
+                    {/if}
+                  </span>
+                </div>
+              </div>
               <div class="status-controls">
                 <button
                   class="status-button {serverStatus.data.isIntervalPaused ? 'start-button' : 'pause-button'}"
@@ -420,23 +436,6 @@
                   <Icon name="fast-forward" />
                   <span>Force Check</span>
                 </button>
-              </div>
-            </div>
-            
-            <div class="status-info">
-              <div class="status-item">
-                <span class="status-label">Public IP:</span>
-                <span class="status-value">{serverStatus.data.externalIp || 'Unknown'}</span>
-              </div>
-              <div class="status-item">
-                <span class="status-label">Next Check:</span>
-                <span class="status-value countdown">
-                  {#if serverStatus.data.isIntervalPaused}
-                    Paused
-                  {:else}
-                    {Math.floor(countdownSeconds / 60)}:{(countdownSeconds % 60).toString().padStart(2, '0')}
-                  {/if}
-                </span>
               </div>
             </div>
           </div>
@@ -561,13 +560,16 @@
     padding: 12px 16px;
     background-color: var(--card-header-bg);
     border-bottom: 1px solid var(--border-color);
+    flex-wrap: wrap;
+    gap: 8px;
   }
   
   .status-header h3 {
     margin: 0;
-    font-size: 1rem;
+    font-size: 1.1rem;
     font-weight: 600;
     color: var(--text-color);
+    min-width: 70px;
   }
   
   .status-controls {
@@ -598,11 +600,15 @@
   
   .pause-button {
     background-color: var(--warning-color);
-    color: white;
+    color: var(--text-color);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    font-weight: 500;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
   }
   
   .pause-button:hover:not(:disabled) {
     background-color: var(--warning-color-dark);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   }
   
   .force-button {
@@ -620,20 +626,21 @@
   }
   
   .status-info {
-    padding: 16px;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    display: flex;
+    flex: 1;
+    gap: 16px;
+    margin: 0 12px;
   }
   
   .status-item {
     display: flex;
-    flex-direction: column;
-    gap: 4px;
+    align-items: center;
+    gap: 8px;
   }
   
   .status-label {
     font-size: 0.75rem;
+    font-weight: 500;
     color: var(--principal-blue);
   }
   
@@ -670,6 +677,99 @@
     .header-section {
       flex-direction: column;
       align-items: stretch;
+    }
+    
+    .status-header {
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    
+    .status-info {
+      order: 3;
+      width: 100%;
+      margin: 0;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .server-status {
+      background-color: var(--card-hover);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .status-section {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .status-header {
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 12px;
+      gap: 12px;
+    }
+    
+    .status-header h3 {
+      font-size: 1.1rem;
+      margin-bottom: 4px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+    }
+    
+    .status-info {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      width: 100%;
+      gap: 12px;
+      padding: 4px 0 12px;
+      border-bottom: 1px solid rgba(var(--border-color-rgb), 0.5);
+    }
+    
+    .status-item {
+      background-color: rgba(var(--card-bg-rgb), 0.5);
+      padding: 8px 10px;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+    }
+    
+    .status-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--principal-blue);
+    }
+    
+    .status-value {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+    
+    .status-controls {
+      width: 100%;
+      justify-content: space-between;
+      padding-top: 8px;
+    }
+    
+    .status-button {
+      flex: 1;
+      justify-content: center;
+      padding: 8px 10px;
+      font-weight: 500;
+      border-radius: 6px;
+    }
+    
+    .status-button span:last-child {
+      font-size: 0.85rem;
+    }
+    
+    .force-button {
+      margin-left: 8px;
     }
   }
 </style>
