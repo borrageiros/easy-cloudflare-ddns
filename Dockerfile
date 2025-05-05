@@ -1,14 +1,6 @@
-FROM node:20
-
-WORKDIR /usr/src/app
-
+FROM node:22
+WORKDIR /app
 COPY . .
-
-RUN npm install -g yarn --force
-
 RUN yarn
-RUN cd interface && yarn
-
-EXPOSE 3000
-
+EXPOSE 5173
 CMD ["yarn", "start"]
