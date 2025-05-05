@@ -6,7 +6,12 @@ import { getIntervalStatus } from '$lib/utils/interval';
 import { countZones, countRecords } from '$lib/db/fileDb';
 
 function parseTime(seconds: number): string {
-  return new Date(seconds * 1000).toISOString().slice(11, 19);
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = seconds % 60;
+
+  const pad = (n: number) => n.toString().padStart(2, '0');
+  return `${pad(hours)}:${pad(minutes)}:${pad(secs)}`;
 }
 
 registerEndpoint({

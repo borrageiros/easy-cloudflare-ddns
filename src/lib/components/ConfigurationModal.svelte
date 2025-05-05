@@ -121,7 +121,14 @@
         isNewConfig = false;
         
         // Dispatch event to notify parent that config was updated
-        dispatch('configUpdated', { checkInterval });
+        if (typeof window !== 'undefined') {
+          const customEvent = new CustomEvent('config-updated', { 
+            detail: { config, checkInterval },
+            bubbles: true,
+            cancelable: true
+          });
+          window.dispatchEvent(customEvent);
+        }
         
         if (!isNewConfig) {
           setTimeout(() => {

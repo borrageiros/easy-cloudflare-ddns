@@ -37,10 +37,6 @@
   // Countdown timer variables
   let countdownInterval: ReturnType<typeof setInterval> | null = null;
   let countdownSeconds = 0;
-
-  function openZonesModal() {
-    zonesModalOpen = true;
-  }
   
   function openRecordsModal(edit = false, record: DnsRecord | null = null) {
     recordEditMode = edit;
@@ -62,12 +58,13 @@
     }
   }
 
-  // Handle config updates
-  function handleConfigUpdated() {
-    // Reload the server status and other data after config update
-    loadServerStatus();
-    loadZones();
-    loadRecords();
+  // Reload the server status and other data after config update
+  async function setupConfigUpdateListener() {
+    if (typeof window !== 'undefined') {
+      window.addEventListener('config-updated', async (event: Event) => {
+        await loadServerStatus();
+      });
+    }
   }
 
   async function loadServerStatus() {    
@@ -85,12 +82,15 @@
         }
         
         startCountdown();
+        return statusData;
       } else {
         serverStatus = null;
+        return null;
       }
     } catch (err) {
       console.error('Error loading server status:', err);
       serverStatus = null;
+      return null;
     }
   }
   
@@ -173,16 +173,19 @@
       if (zonesData) {
         zones = zonesData;
         filterZones();
+        return zonesData;
       } else {
         zones = [];
         filteredZones = [];
         error = 'Failed to load zones';
+        return null;
       }
     } catch (err) {
       console.error('Error loading zones:', err);
       error = 'Error loading zones';
       zones = [];
       filteredZones = [];
+      return null;
     } finally {
       loading = false;
     }
@@ -197,16 +200,19 @@
       if (recordsData) {
         records = recordsData;
         filterRecords();
+        return recordsData;
       } else {
         records = [];
         filteredRecords = [];
         recordsError = 'Failed to load records';
+        return null;
       }
     } catch (err) {
       console.error('Error loading records:', err);
       recordsError = 'Error loading records';
       records = [];
       filteredRecords = [];
+      return null;
     } finally {
       loadingRecords = false;
     }
@@ -237,39 +243,10 @@
     );
   }
   
-  async function handleDeleteZone(zoneId: string) {
-    if (!zoneId) return;
-    
-    deletingZoneId = zoneId;
-    
-    deleteZone(zoneId)
-      .then((success) => {
-        if (success) {
-          // Remove the zone from the list
-          zones = zones.filter(zone => zone.id !== zoneId);
-          filterZones();
-          
-          // Remove any records associated with this zone
-          records = records.filter(record => record.zoneId !== zoneId);
-          filterRecords();
-        } else {
-          console.error('Failed to delete zone');
-        }
-      })
-      .catch((err) => {
-        console.error('Error deleting zone:', err);
-      })
-      .finally(() => {
-        deletingZoneId = null;
-      });
-  }
-  
-  function handleEditRecord(record: DnsRecord) {
-    openRecordsModal(true, record);
-  }
-  
   onMount(async () => {
     if (browser) {
+      setupConfigUpdateListener();
+
       // Check if user is authenticated
       const authenticated = await isAuthenticated();
       if (!authenticated) {
@@ -295,14 +272,6 @@
       clearInterval(countdownInterval);
     }
   });
-  
-  function handleZonesModalClose() {
-    loadZones();
-  }
-  
-  function handleRecordsModalClose() {
-    loadRecords();
-  }
 
   function handleZoneAdded(event: CustomEvent) {
     const newZone = event.detail;
@@ -356,28 +325,14 @@
   function handleRecordSearchChange() {
     filterRecords();
   }
-  
-  function parseTTL(seconds: number): string {
-    if (seconds === 1) {
-      return 'Auto';
-    }
-    const days = Math.floor(seconds / (24 * 3600));
-    seconds %= 24 * 3600;
-    const hours = Math.floor(seconds / 3600);
-    seconds %= 3600;
-    const minutes = Math.floor(seconds / 60);
-    seconds %= 60;
-    const parts = [];
-    if (days) parts.push(`${days} day${days !== 1 ? 's' : ''}`);
-    if (hours) parts.push(`${hours} hour${hours !== 1 ? 's' : ''}`);
-    if (minutes) parts.push(`${minutes} minute${minutes !== 1 ? 's' : ''}`);
-    if (seconds || parts.length === 0) parts.push(`${seconds} second${seconds !== 1 ? 's' : ''}`);
-
-    return parts.join(', ');
-  }
 
   function parseTime(seconds: number): string {
-    return new Date(seconds * 1000).toISOString().slice(11, 19);
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    return `${pad(hours)}:${pad(minutes)}:${pad(secs)}`;
   }
   
   $: if (zoneSearchQuery !== undefined) {
@@ -417,7 +372,7 @@
                     {#if serverStatus.data.isIntervalPaused}
                       Paused
                     {:else}
-                      {Math.floor(countdownSeconds / 60)}:{(countdownSeconds % 60).toString().padStart(2, '0')}
+                      {parseTime(countdownSeconds)}
                     {/if}
                   </span>
                 </div>
@@ -497,7 +452,6 @@
 
   <ConfigurationModal 
     bind:open={configModalOpen}
-    on:configUpdated={handleConfigUpdated}
   />
 {/if}
 
