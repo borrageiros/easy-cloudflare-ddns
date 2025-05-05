@@ -29,10 +29,10 @@ import './routes/api/zones/create/+server';
 import './routes/api/zones/[id]/delete/+server';
 
 // Records
+import './routes/api/records/get/+server';
 import './routes/api/records/create/+server';
 import './routes/api/records/[id]/update/+server';
 import './routes/api/records/[id]/delete/+server';
-import './routes/api/records/get/+server';
 
 // Docs
 import './routes/api/docs/swagger.json/+server';

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { icons, flags } from '$lib/icons';
+	import { icons } from '$lib/icons';
 	
 	export let name = '';
 	export let size = 24;
@@ -23,17 +23,6 @@
 		{...$$restProps}
 	>
 		{@html icons[name]}
-	</svg>
-{:else if type === 'flag' && flags[name]}
-	<svg
-		width={size}
-		height={size}
-		viewBox="0 0 640 480"
-		fill={color}
-		class="flag {className}"
-		{...$$restProps}
-	>
-		{@html flags[name]}
 	</svg>
 {:else}
 	<svg

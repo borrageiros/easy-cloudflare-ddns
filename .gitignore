@@ -1,31 +1,57 @@
+# Dependencies
 node_modules
+.pnpm-store/
 
-# Output
+# Build outputs
+/.svelte-kit
+/build
 .output
 .vercel
 .netlify
 .wrangler
-/.svelte-kit
-/build
 
-# OS
+# Operating system files
 .DS_Store
 Thumbs.db
+*.swp
+*.swo
 
-# Env
+# Environment variables
 .env
 .env.*
 !.env.example
 !.env.test
 
-# Vite
+# Vite files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
+# Editor
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
 .cursor
 
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Application specific files
 data/database.json
 data/jwt-secret
+data/cloudflare-token.json
 
-.svelte-kit
-build
+# Testing
+coverage/
+/test-results/
+/playwright-report/
+/playwright/.cache/
+
+# Packages
+package-lock.json
+yarn.lock

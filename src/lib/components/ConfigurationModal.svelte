@@ -209,7 +209,7 @@
     
     {#if verifySuccess}
       <div class="success-message verify-success">
-        <Icon name="check" />
+        <Icon name="check-circle" />
         {verifySuccess}
       </div>
     {/if}

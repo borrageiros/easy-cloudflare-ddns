@@ -111,14 +111,16 @@ export interface ZonesResponse {
 
 // Type for server status response
 export interface ServerStatusResponse {
-  success: boolean;
-  externalIp: string;
-  lastIp: string;
-  nextCheck: number;
-  isIntervalPaused: boolean;
-  timeParsed: string;
-  zonesCount: number;
-  recordsCount: number;
+  data: {
+    success: boolean;
+    externalIp: string;
+    lastIp: string;
+    nextCheck: number;
+    isIntervalPaused: boolean;
+    timeParsed: string;
+    zonesCount: number;
+    recordsCount: number;
+  }
 }
 
 // Type for toggle interval response

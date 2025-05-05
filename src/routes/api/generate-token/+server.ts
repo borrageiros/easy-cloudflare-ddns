@@ -1,8 +1,9 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import { getJwtSecret } from '$lib/jwtSecret';
-import { successResponse, unauthorizedResponse } from '$lib/utils/responses';
+import { errorResponse, successResponse } from '$lib/utils/responses';
 import { registerEndpoint } from '$lib/swagger';
+import { requireAuth } from '$lib/auth/verifyAuth';
 
 interface GenerateTokenRequest {
   rememberSession?: boolean;
@@ -63,36 +64,35 @@ registerEndpoint({
   }
 });
 
-export const POST: RequestHandler = async ({ request }) => {
-  const authHeader = request.headers.get('Authorization');
-  
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return unauthorizedResponse('No valid token provided', { success: false });
-  }
-  
-  const token = authHeader.split(' ')[1];
-  const jwtSecret: string = getJwtSecret();
-  
-  try {
-    jwt.verify(token, jwtSecret);
+export const POST: RequestHandler = async (event) => {
+  return requireAuth(event, async () => {
+    try {
+      const authHeader = event.request.headers.get('Authorization');      
+      const token = authHeader?.split(' ')[1];
+      const jwtSecret: string = getJwtSecret();
+      jwt.verify(token, jwtSecret);
     
-    const { rememberSession = false } = await request.json() as GenerateTokenRequest;
-    
-    const tokenOptions = rememberSession 
-      ? {} 
-      : { expiresIn: '24h' };
-    
-    const newToken: string = jwt.sign(
-      { authenticated: true } as TokenPayload,
-      jwtSecret,
-      tokenOptions
-    );
-    
-    return successResponse({
-      success: true,
-      token: newToken
-    });
-  } catch {
-    return unauthorizedResponse('Token invalid or expired', { success: false });
-  }
+      let rememberSession = false;
+      const requestBody = await event.request.json() as GenerateTokenRequest;
+      rememberSession = requestBody?.rememberSession ?? false;
+      
+      const tokenOptions = rememberSession 
+        ? {} 
+        : { expiresIn: '24h' };
+      
+      const newToken: string = jwt.sign(
+        { authenticated: true } as TokenPayload,
+        jwtSecret,
+        tokenOptions
+      );
+
+      return successResponse({
+        success: true,
+        token: newToken
+      });
+    } catch (err) {
+      console.error('Error generating token:', err);
+      return errorResponse('Error generating token', 500);
+    }
+  });
 } 

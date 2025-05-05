@@ -10,7 +10,7 @@ function parseTime(seconds: number): string {
 }
 
 registerEndpoint({
-  path: '/status',
+  path: '/api/status',
   description: 'Get the status of the server',
   method: 'get',
   tags: ['Application'],
@@ -41,13 +41,15 @@ export const GET: RequestHandler = async (event) => {
     try {
       const intervalStatusResponse = await getIntervalStatus();
       return successResponse({
-        lastIp: intervalStatusResponse.lastIp,
-        externalIp: intervalStatusResponse.externalIp,
-        nextCheck: intervalStatusResponse.nextCheck,
-        isIntervalPaused: intervalStatusResponse.isPaused,
-        timeParsed: parseTime(intervalStatusResponse.nextCheck),
-        zonesCount: await countZones(),
-        recordsCount: await countRecords()
+        data: {
+          lastIp: intervalStatusResponse.lastIp,
+          externalIp: intervalStatusResponse.externalIp,
+          nextCheck: intervalStatusResponse.nextCheck,
+          isIntervalPaused: intervalStatusResponse.isPaused,
+          timeParsed: parseTime(intervalStatusResponse.nextCheck),
+          zonesCount: await countZones(),
+          recordsCount: await countRecords()
+        }
       });
     } catch (err) {
       console.error('Error getting records:', err);

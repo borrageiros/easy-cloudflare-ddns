@@ -1,5 +1,5 @@
 import type { RequestHandler } from '@sveltejs/kit';
-import { deleteZone } from '$lib/db/fileDb';
+import { deleteZone, getRecords } from '$lib/db/fileDb';
 import { successResponse, errorResponse, notFoundResponse } from '$lib/utils/responses';
 import { registerEndpoint } from '$lib/swagger';
 import { requireAuth } from '$lib/auth/verifyAuth';
@@ -20,6 +20,20 @@ registerEndpoint({
             properties: {
               success: { type: 'boolean' },
               message: { type: 'string' }
+            }
+          }
+        }
+      }
+    },
+    '400': {
+      description: 'Bad request - Zone has associated records',
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            properties: {
+              success: { type: 'boolean' },
+              error: { type: 'string' }
             }
           }
         }
@@ -77,6 +91,14 @@ export const DELETE: RequestHandler = async (event) => {
       
       if (!id) {
         return notFoundResponse('Zone ID is required');
+      }
+      
+      // Check if there are records associated with this zone
+      const records = await getRecords();
+      const hasAssociatedRecords = records.some(record => record.zoneId === id);
+      
+      if (hasAssociatedRecords) {
+        return errorResponse('Cannot delete a zone with associated records. Delete the records first.', 400);
       }
       
       const deleted = await deleteZone(id);

@@ -1,13 +1,39 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import { login } from '$lib/api';
+  import { login, isAuthenticated, validateToken } from '$lib/api';
   import { fade } from 'svelte/transition';
   import Icon from '$lib/components/Icon.svelte';
+  import { onMount } from 'svelte';
+  import { browser } from '$app/environment';
   
   let password: string = '';
   let rememberSession: boolean = false;
   let error: string = '';
   let isLoading: boolean = false;
+  let pageReady: boolean = false;
+  let passwordInput: HTMLInputElement;
+  
+  // Verify authentication when the page loads
+  onMount(async () => {
+    // If already authenticated with a valid token, redirect to the main page
+    if (isAuthenticated()) {
+      const isValid = await validateToken();
+      if (isValid) {
+        goto('/');
+        return;
+      }
+    }
+    
+    // If not authenticated or the token is invalid, show the login page
+    pageReady = true;
+    
+    // Focus the password input after the component is mounted and ready
+    setTimeout(() => {
+      if (passwordInput) {
+        passwordInput.focus();
+      }
+    }, 100);
+  });
   
   async function handleLogin(): Promise<void> {
     isLoading = true;
@@ -17,7 +43,12 @@
       const response = await login(password, rememberSession);
       
       if (response.success) {
-        goto('/');
+        if (browser) {
+          window.location.href = '/';
+        } else {
+          goto('/');
+        }
+        return;
       } else {
         error = response.message || 'Incorrect password';
       }
@@ -30,60 +61,89 @@
   }
 </script>
 
-<div class="login-page">
-  <div class="login-wrapper">
-    <div class="login-container card" transition:fade={{ duration: 300 }}>
-      <div class="login-header">
-        <h1 class="login-title">
-          Easy
-          <a href="https://www.cloudflare.com" target="_blank">
-            <span class="cloud-flare">
-              <Icon name="cloud" />
-              CloudFlare
-            </span>
-          </a>
-          DDNS
-        </h1>
-      </div>
-      
-      <form on:submit|preventDefault={handleLogin}>
-        <div class="form-content">
-          <div class="form-group">
-            <input 
-              type="password" 
-              id="password" 
-              bind:value={password} 
-              disabled={isLoading}
-              required
-              placeholder="Password"
-            />
-          </div>
-          
-          <div class="form-group remember-me">
-            <label for="remember">
-              <input 
-                type="checkbox" 
-                id="remember" 
-                bind:checked={rememberSession}
-              />
-              <span>Keep session logged in</span>
-            </label>
-          </div>
-          
-          {#if error}
-            <div class="error" transition:fade={{ duration: 200 }}>{error}</div>
-          {/if}
-          
-          <button type="submit" class="login-button" disabled={isLoading}>
-            {isLoading ? 'Processing...' : 'Login'}
-          </button>
+{#if pageReady}
+  <div class="login-page" transition:fade={{ duration: 200 }}>
+    <div class="login-wrapper">
+      <div class="login-container card" transition:fade={{ duration: 300 }}>
+        <div class="login-header">
+          <h1 class="login-title">
+            Easy
+            <a href="https://www.cloudflare.com" target="_blank">
+              <span class="cloud-flare">
+                <Icon name="cloud" />
+                CloudFlare
+              </span>
+            </a>
+            DDNS
+          </h1>
         </div>
-      </form>
+        
+        <form on:submit|preventDefault={handleLogin}>
+          <div class="form-content">
+            <div class="form-group">
+              <input 
+                type="password" 
+                id="password" 
+                bind:value={password} 
+                bind:this={passwordInput}
+                disabled={isLoading}
+                required
+                placeholder="Password"
+              />
+            </div>
+            
+            <div class="form-group remember-me">
+              <label for="remember">
+                <input 
+                  type="checkbox" 
+                  id="remember" 
+                  bind:checked={rememberSession}
+                />
+                <span>Keep session logged in</span>
+              </label>
+            </div>
+            
+            {#if error}
+              <div class="error" transition:fade={{ duration: 200 }}>{error}</div>
+            {/if}
+            
+            <button type="submit" class="login-button" disabled={isLoading}>
+              {isLoading ? 'Processing...' : 'Login'}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
-</div>
+{:else}
+  <div class="login-loading">
+    <span class="spinner-large"></span>
+  </div>
+{/if}
 
 <style>
+  .login-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100%;
+  }
+  
+  .spinner-large {
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    border: 3px solid rgba(128, 128, 128, 0.3);
+    border-radius: 50%;
+    border-top-color: var(--principal-orange);
+    animation: spin 1s ease-in-out infinite;
+  }
+  
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
   .login-page {
     height: 100vh;
     width: 100%;

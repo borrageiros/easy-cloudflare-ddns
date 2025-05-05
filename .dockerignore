@@ -1,0 +1,55 @@
+# Node modules
+node_modules/
+
+# Build outputs
+build/
+.svelte-kit/
+static/build/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Editor directories and files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Docker files (no need to copy these)
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Git related
+.git/
+.gitignore
+.github/
+
+# Testing
+coverage/
+tests/
+test-results/
+playwright-report/
+
+# Miscellaneous
+README.md
+LICENSE
+.turbo
+.npmrc
+.pretierrc
+.eslintrc
+.eslintignore

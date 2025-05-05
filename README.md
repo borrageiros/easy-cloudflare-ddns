@@ -2,7 +2,7 @@
 
 💻 Web Interface - Dynamic DNS service to automatically update CloudFlare records!
 
-![screenshot](./readme/screenshot.jpg)
+![screenshot](./readme/screenshot.png)
 
 # 🚦 Getting Started
 
@@ -46,11 +46,12 @@ Example command:
 
 ```
 docker run -d
---name=easy-cloudflare-ddns
--v /path/to/new/folder:/app/data
--p 5173:5173
--e PASSWORD=abc123
-borrageiros/easy-cloudflare-ddns
+  --restart on-failure \
+  --name=easy-cloudflare-ddns \
+  -v /path/to/new/folder:/app/data \
+  -p 5173:5173 \
+  -e PASSWORD=abc123 \
+  borrageiros/easy-cloudflare-ddns
 ```
 
 ## 📡 Api
@@ -70,7 +71,7 @@ If you want to run the application with Node.js, follow these steps:
 
 #### 🚧 | Prerequisites
 
-- Install -> [Node.js >= 20](https://nodejs.org/en/download/)
+- Install -> [Node.js >= 22](https://nodejs.org/en/download/)
 - Install -> [Yarn](https://classic.yarnpkg.com/lang/en/docs/install/#windows-stable)
 
 - Install requirements:
@@ -98,3 +99,31 @@ yarn start
 ```
 yarn dev
 ```
+
+- Custom port:
+
+```
+yarn start --port 3000
+yarn dev --port 3000
+```
+
+## 🔐 Authentication
+
+To enter the interface, you need to set a password.
+
+- The password is set through the `PASSWORD` environment variable
+- The application securely stores credentials using encryption with an auto-generated key
+
+To use the API:
+
+- You need to generate an API key through the web interface.
+- To use the API, you need to pass the API key in the `Authorization` header with the value `Bearer {api-key}`
+
+## 🛠️ Technologies
+
+This application is built with:
+
+- **Application**: Sveltekit 5
+- **Database**: Local json file based storage
+- **API**: RESTful API with Swagger documentation
+- **Containerization**: Docker support

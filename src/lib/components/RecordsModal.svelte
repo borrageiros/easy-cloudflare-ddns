@@ -1,6 +1,6 @@
 <script lang="ts">
   import Modal from '$lib/components/Modal.svelte';
-  import { getZones, createRecord, updateRecord, getCloudFlareRecords } from '$lib/api';
+  import { getZones, createRecord, updateRecord, getCloudFlareRecords, getRecords, deleteRecord } from '$lib/api';
   import type { DnsZone, DnsRecord, CloudFlareDnsRecord } from '$lib/api';
   import Icon from '$lib/components/Icon.svelte';
   import { createEventDispatcher } from 'svelte';
@@ -13,8 +13,10 @@
   
   let loading = false;
   let saving = false;
+  let deleting = false;
   let zones: DnsZone[] = [];
   let cloudflareRecords: CloudFlareDnsRecord[] = [];
+  let databaseRecords: DnsRecord[] = [];
   let filteredRecords: CloudFlareDnsRecord[] = [];
   let displayedRecords: CloudFlareDnsRecord[] = [];
   let error = '';
@@ -25,6 +27,9 @@
   let selectedRecord: CloudFlareDnsRecord | null = null;
   let ttl = 1;
   let proxied = false;
+  
+  // Reference to the search input for focus
+  let searchInputElement: HTMLInputElement;
   
   // TTL options based on CloudFlare standard values
   const ttlOptions = [
@@ -84,6 +89,13 @@
       zones = [];
     } finally {
       loading = false;
+      
+      // Set focus on search input after loading is complete and in create mode
+      if (!editMode && searchInputElement && !loading) {
+        setTimeout(() => {
+          searchInputElement.focus();
+        }, 100);
+      }
     }
   }
   
@@ -93,15 +105,32 @@
     searchQuery = '';
     
     try {
-      const recordsData = await getCloudFlareRecords(zoneId);
+      // Load CloudFlare and database records
+      const [recordsData, dbRecords] = await Promise.all([
+        getCloudFlareRecords(zoneId),
+        getRecords()
+      ]);
       
       if (recordsData && recordsData.length > 0) {
         cloudflareRecords = recordsData;
-        filteredRecords = recordsData;
-        displayedRecords = recordsData;
         
-        if (!editMode) {
-          selectedRecord = recordsData[0];
+        // Save database records
+        databaseRecords = dbRecords || [];
+        
+        // Filter CloudFlare records that are not in the database
+        filteredRecords = cloudflareRecords.filter(cfRecord => 
+          !databaseRecords.some(dbRecord => 
+            dbRecord.id === cfRecord.id && dbRecord.zoneId === zoneId
+          )
+        );
+        
+        displayedRecords = [...filteredRecords];
+        
+        if (filteredRecords.length === 0) {
+          error = 'No more records available to add in this zone';
+          selectedRecord = null;
+        } else {
+          selectedRecord = filteredRecords[0];
           ttl = selectedRecord.ttl;
           proxied = selectedRecord.proxied;
         }
@@ -200,6 +229,21 @@
         if (savedRecord) {
           success = `Record "${selectedRecord.name}" saved successfully`;
           dispatch('recordAdded', savedRecord);
+          
+          // Update the lists of records after saving
+          databaseRecords = [...databaseRecords, savedRecord];
+          filteredRecords = filteredRecords.filter(record => record.id !== selectedRecord?.id);
+          displayedRecords = displayedRecords.filter(record => record.id !== selectedRecord?.id);
+          
+          if (filteredRecords.length > 0) {
+            selectedRecord = filteredRecords[0];
+            ttl = selectedRecord.ttl;
+            proxied = selectedRecord.proxied;
+          } else {
+            selectedRecord = null;
+            error = 'No more records available to add in this zone';
+          }
+          
           setTimeout(() => {
             closeModal();
           }, 2000);
@@ -212,6 +256,36 @@
       error = 'Error saving record';
     } finally {
       saving = false;
+    }
+  }
+  
+  async function handleDelete() {
+    if (!editMode || !recordToEdit) {
+      error = 'No record to delete';
+      return;
+    }
+    
+    deleting = true;
+    error = '';
+    success = '';
+    
+    try {
+      const deleteSuccess = await deleteRecord(recordToEdit.id);
+      
+      if (deleteSuccess) {
+        success = `Record "${recordToEdit.name}" deleted successfully`;
+        dispatch('recordDeleted', recordToEdit);
+        setTimeout(() => {
+          closeModal();
+        }, 2000);
+      } else {
+        error = 'Failed to delete record';
+      }
+    } catch (err) {
+      console.error('Error deleting record:', err);
+      error = 'Error deleting record';
+    } finally {
+      deleting = false;
     }
   }
   
@@ -321,7 +395,8 @@
                 id="record-search"
                 type="text" 
                 bind:value={searchQuery}
-                placeholder="Search records by name or type..."
+                bind:this={searchInputElement}
+                placeholder="Search records..."
                 disabled={saving || filteredRecords.length === 0}
               />
               <button class="clear-search" on:click={() => searchQuery = ''} disabled={!searchQuery}>
@@ -332,6 +407,8 @@
             <div class="record-info">
               {#if displayedRecords.length !== filteredRecords.length}
                 <small>Showing {displayedRecords.length} of {filteredRecords.length} records</small>
+              {:else if filteredRecords.length !== cloudflareRecords.length}
+                <small>Showing {filteredRecords.length} of {cloudflareRecords.length} available records (excluding {cloudflareRecords.length - filteredRecords.length} already added)</small>
               {:else}
                 <small>Total records: {filteredRecords.length}</small>
               {/if}
@@ -361,13 +438,16 @@
         {/if}
         
         <div class="form-group checkbox-group">
-          <label for="proxied-input">Proxied</label>
+          <span class="icon-cloud">
+            <Icon name="cloud" />
+            <label for="proxied-input">Proxied</label>
+          </span>
           <input 
             id="proxied-input"
             type="checkbox" 
             bind:checked={proxied}
             on:change={handleProxiedChange}
-            disabled={saving}
+            disabled={saving || deleting}
           />
         </div>
         
@@ -376,7 +456,7 @@
           <select 
             id="ttl-select"
             bind:value={ttl}
-            disabled={saving || proxied}
+            disabled={saving || deleting || proxied}
             class={proxied ? 'disabled' : ''}
           >
             {#each ttlOptions as option}
@@ -391,11 +471,26 @@
     {/if}
     
     <div class="action-buttons">
+      {#if editMode && recordToEdit}
+        <button 
+          class="delete-button" 
+          on:click={handleDelete}
+          disabled={loading || saving || deleting}
+        >
+          {#if deleting}
+            <span class="spinner"></span>
+          {:else}
+            <Icon name="trash" />
+          {/if}
+          Delete Record
+        </button>
+      {/if}
+      
       <div class="right-buttons">
         <button 
           class="save-button" 
           on:click={handleSave}
-          disabled={loading || saving || (!editMode && (!selectedRecord || !selectedZone))}
+          disabled={loading || saving || deleting || (!editMode && (!selectedRecord || !selectedZone))}
         >
           {#if saving}
             <span class="spinner"></span>
@@ -408,7 +503,7 @@
         <button 
           class="close-button" 
           on:click={closeModal}
-          disabled={saving}
+          disabled={saving || deleting}
         >
           <Icon name="x" />
           Close
@@ -482,6 +577,14 @@
   
   .form-group .record-select {
     height: auto;
+  }
+
+
+  .icon-cloud {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--principal-orange);
   }
   
   .search-container {
@@ -571,7 +674,7 @@
   
   .action-buttons {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     margin-top: 8px;
   }
   
@@ -580,7 +683,7 @@
     gap: 8px;
   }
   
-  .save-button, .close-button {
+  .save-button, .close-button, .delete-button {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -611,6 +714,15 @@
     background-color: var(--card-hover);
   }
   
+  .delete-button {
+    background-color: var(--error-color);
+    color: white;
+  }
+  
+  .delete-button:hover:not(:disabled) {
+    background-color: var(--error-color-dark);
+  }
+  
   button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -636,7 +748,7 @@
       gap: 4px;
     }
     
-    .save-button, .close-button {
+    .save-button, .close-button, .delete-button {
       padding: 8px 12px;
       font-size: 0.8rem;
     }
@@ -654,6 +766,10 @@
     .action-buttons {
       flex-direction: column;
       gap: 12px;
+    }
+    
+    .delete-button {
+      width: 100%;
     }
     
     .right-buttons {
