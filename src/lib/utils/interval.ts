@@ -128,3 +128,38 @@ export function getSecondsUntilnextCheck(): number {
   const remainingMilliseconds = Math.max(0, nextCheckTime - Date.now());
   return Math.ceil(remainingMilliseconds / 1000);
 }
+
+export async function forceCloudflareUpdate(): Promise<boolean> {
+  try {
+    const externalIp = await getServerExternalIp();
+    const records = await getRecords();
+    
+    if (records.length === 0) {
+      return false;
+    }
+    
+    for (const record of records) {
+      await updateRecordCloudflare(
+        record.zoneId,
+        record.id,
+        {
+          name: record.name,
+          type: record.type,
+          content: externalIp,
+          proxied: record.proxied,
+          ttl: record.ttl
+        }
+      );
+      await updateRecordFileDb(record.id, { content: externalIp });
+    }
+    
+    const config = await getUserConfig();
+    config.lastIp = externalIp;
+    await updateUserConfig(config);
+    
+    return true;
+  } catch (error) {
+    console.error('Error forcing Cloudflare update:', error);
+    return false;
+  }
+}

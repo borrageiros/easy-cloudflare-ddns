@@ -20,6 +20,7 @@
   let verifySuccess = '';
   let isVerifying = false;
   let isNewConfig = true;
+  let showApiKey = false;
   
   function closeModal() {
     if (!saving && !isNewConfig) {
@@ -188,15 +189,25 @@
       />
     </div>
     
-    <div class="form-group">
+    <div class="form-group password-group">
       <label for="apiKey">API Key</label>
-      <input 
-        type="password" 
-        id="apiKey" 
-        bind:value={apiKey} 
-        disabled={saving}
-        placeholder="CloudFlare API Key"
-      />
+      <div class="password-input-wrapper">
+        <input 
+          type={showApiKey ? 'text' : 'password'} 
+          id="apiKey" 
+          bind:value={apiKey} 
+          disabled={saving}
+          placeholder="CloudFlare API Key"
+        />
+        <button 
+          type="button" 
+          class="toggle-password" 
+          on:click={() => showApiKey = !showApiKey}
+          tabindex="-1"
+        >
+          <Icon name={showApiKey ? 'eye-off' : 'eye'} size={18} />
+        </button>
+      </div>
       <a href="https://developers.cloudflare.com/fundamentals/api/get-started/create-token/" target="_blank">
         <small>You can find your API Key in the CloudFlare panel</small>
       </a>
@@ -263,6 +274,39 @@
     display: flex;
     flex-direction: column;
     gap: 4px;
+  }
+  
+  .password-group {
+    position: relative;
+  }
+  
+  .password-input-wrapper {
+    position: relative;
+  }
+  
+  .toggle-password {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-color-secondary);
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+  }
+  
+  .toggle-password:hover {
+    color: var(--text-color);
+  }
+  
+  .password-input-wrapper input {
+    padding-right: 40px;
+    width: 100%;
   }
   
   label {

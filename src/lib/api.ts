@@ -225,6 +225,35 @@ export async function forceInterval(): Promise<ToggleIntervalResponse | null> {
 }
 
 /**
+ * Force update all DNS records to Cloudflare
+ * @returns Success status
+ */
+export async function forceCloudflareUpdate(): Promise<boolean> {
+  if (!isAuthenticated()) {
+    return false;
+  }
+
+  try {
+    const response = await fetch('/api/interval/force-update', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+      }
+    });
+
+    if (!response.ok) {
+      return false;
+    }
+
+    const data = await response.json() as ApiResponse<{ message: string }>;
+    return data.success === true;
+  } catch (error) {
+    console.error('Error forcing Cloudflare update:', error);
+    return false;
+  }
+}
+
+/**
  * Login
  * @param password - The password to login
  * @param rememberSession - Whether to remember the session

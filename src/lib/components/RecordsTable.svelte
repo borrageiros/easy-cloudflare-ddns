@@ -41,8 +41,10 @@
         </button>
       </div>
       <button class="add-button" on:click={() => openRecordsModal()}>
-        <Icon name="plus" />
-        <span>Add Record</span>
+        <span class="icon-wrapper">
+          <Icon name="plus" />
+        </span>
+        <span class="button-text">Record</span>
       </button>
     </div>
   </div>
@@ -61,10 +63,6 @@
   {:else if records.length === 0}
     <div class="empty-state">
       <p>No records found. Add a record to get started.</p>
-      <button class="add-button" on:click={() => openRecordsModal()}>
-        <Icon name="plus-circle" />
-        <span>Add Record</span>
-      </button>
     </div>
   {:else}
     <div class="table-container">
@@ -209,7 +207,8 @@
   }
   
   .add-button {
-    display: flex;
+    display: grid;
+    grid-template-columns: 20px 1fr;
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 0.75rem;
@@ -220,6 +219,25 @@
     cursor: pointer;
     font-size: 0.875rem;
     font-weight: 500;
+    white-space: nowrap;
+    width: 130px;
+    min-width: 130px;
+    max-width: 130px;
+    flex-shrink: 0;
+    box-sizing: border-box;
+  }
+  
+  .add-button .icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    flex-shrink: 0;
+  }
+  
+  .add-button .button-text {
+    text-align: center;
+    flex: 1;
   }
   
   .add-button:hover {

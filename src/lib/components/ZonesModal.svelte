@@ -176,7 +176,9 @@
             </div>
             <div class="detail-item">
               <span class="detail-label">Status:</span>
-              <span class="detail-value">{selectedZone.status}</span>
+              <span class="status-badge status-{selectedZone.status?.toLowerCase() || 'unknown'}">
+                {selectedZone.status?.toUpperCase() || 'UNKNOWN'}
+              </span>
             </div>
           </div>
         {/if}
@@ -192,7 +194,7 @@
         {#if loading}
           <Loader size="small" />
         {:else}
-          <Icon name="refresh-cw" />
+          <Icon name="refresh" />
         {/if}
         Refresh Zones
       </button>
@@ -325,6 +327,52 @@
   .detail-value {
     color: var(--text-color-secondary);
     word-break: break-all;
+  }
+  
+  .status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  
+  .status-active {
+    background-color: rgba(var(--success-color-rgb), 0.15);
+    color: var(--success-color);
+    border: 1px solid var(--success-color);
+  }
+  
+  .status-pending {
+    background-color: rgba(var(--warning-color-rgb), 0.15);
+    color: var(--warning-color);
+    border: 1px solid var(--warning-color);
+  }
+  
+  .status-initializing {
+    background-color: rgba(var(--principal-blue-rgb), 0.15);
+    color: var(--principal-blue);
+    border: 1px solid var(--principal-blue);
+  }
+  
+  .status-moved {
+    background-color: rgba(var(--text-color-rgb), 0.1);
+    color: var(--text-color-secondary);
+    border: 1px solid var(--border-color);
+  }
+  
+  .status-deleted {
+    background-color: rgba(var(--error-color-rgb), 0.15);
+    color: var(--error-color);
+    border: 1px solid var(--error-color);
+  }
+  
+  .status-unknown {
+    background-color: rgba(var(--text-color-rgb), 0.1);
+    color: var(--text-color-secondary);
+    border: 1px solid var(--border-color);
   }
   
   .action-buttons {

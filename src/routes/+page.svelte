@@ -6,7 +6,7 @@
   import ZonesTable from "$lib/components/ZonesTable.svelte";
   import RecordsTable from "$lib/components/RecordsTable.svelte";
   import { onMount, onDestroy } from "svelte";
-  import { getZones, deleteZone, getRecords, getServerStatus, toggleInterval, forceInterval, getUserConfig, isAuthenticated } from "$lib/api";
+  import { getZones, deleteZone, getRecords, getServerStatus, toggleInterval, forceInterval, forceCloudflareUpdate, getUserConfig, isAuthenticated } from "$lib/api";
   import type { DnsZone, DnsRecord, ServerStatusResponse } from "$lib/api";
   import { browser } from '$app/environment';
   import Loader from '$lib/components/Loader.svelte';
@@ -33,6 +33,7 @@
   let deletingZoneId: string | null = null;
   let serverStatus: ServerStatusResponse | null = null;
   let togglingInterval = false;
+  let forcingCloudflareUpdate = false;
   
   // Countdown timer variables
   let countdownInterval: ReturnType<typeof setInterval> | null = null;
@@ -160,6 +161,27 @@
       }
     } catch (err) {
       console.error('Error forcing interval:', err);
+    }
+  }
+
+  async function handleForceCloudflareUpdate() {
+    if (forcingCloudflareUpdate) return;
+    
+    forcingCloudflareUpdate = true;
+    try {
+      const success = await forceCloudflareUpdate();
+      if (success) {
+        const serverStatusData = await getServerStatus();
+        if (serverStatusData) {
+          serverStatus = serverStatusData;
+        }
+      } else {
+        console.error('Failed to force Cloudflare update');
+      }
+    } catch (err) {
+      console.error('Error forcing Cloudflare update:', err);
+    } finally {
+      forcingCloudflareUpdate = false;
     }
   }
   
@@ -399,6 +421,19 @@
                   <Icon name="fast-forward" />
                   <span>Force Check</span>
                 </button>
+                
+                <button 
+                  class="status-button update-button" 
+                  on:click={handleForceCloudflareUpdate}
+                  disabled={forcingCloudflareUpdate || records.length === 0}
+                >
+                  {#if forcingCloudflareUpdate}
+                    <Loader size="small" color="white" />
+                  {:else}
+                    <Icon name="cloud" />
+                  {/if}
+                  <span>Force Update</span>
+                </button>
               </div>
             </div>
           </div>
@@ -424,15 +459,17 @@
         on:zoneDeleted={handleZoneDeleted}
       />
       
-      <RecordsTable 
-        {records}
-        {filteredRecords}
-        loading={loadingRecords}
-        error={recordsError}
-        bind:recordSearchQuery={recordSearchQuery}
-        on:openRecordsModal={handleOpenRecordsModal}
-        on:filterRecords={handleRecordSearchChange}
-      />
+      {#if zones.length > 0}
+        <RecordsTable 
+          {records}
+          {filteredRecords}
+          loading={loadingRecords}
+          error={recordsError}
+          bind:recordSearchQuery={recordSearchQuery}
+          on:openRecordsModal={handleOpenRecordsModal}
+          on:filterRecords={handleRecordSearchChange}
+        />
+      {/if}
     </div>
   </div>
 
@@ -572,6 +609,20 @@
   }
   
   .force-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .update-button {
+    background-color: var(--principal-orange);
+    color: var(--text-color);
+  }
+  
+  .update-button:hover:not(:disabled) {
+    background-color: var(--principal-orange-dark);
+  }
+  
+  .update-button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
   }

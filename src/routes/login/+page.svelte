@@ -14,6 +14,7 @@
   let isLoading: boolean = false;
   let pageReady: boolean = false;
   let passwordInput: HTMLInputElement;
+  let showPassword: boolean = false;
   
   // Verify authentication when the page loads
   onMount(async () => {
@@ -82,16 +83,24 @@
       
       <form on:submit|preventDefault={handleLogin}>
         <div class="form-content">
-          <div class="form-group">
+          <div class="form-group password-group">
             <input 
-              type="password" 
+              type={showPassword ? 'text' : 'password'} 
               id="password" 
               bind:value={password} 
-                bind:this={passwordInput}
+              bind:this={passwordInput}
               disabled={isLoading}
               required
               placeholder="Password"
             />
+            <button 
+              type="button" 
+              class="toggle-password" 
+              on:click={() => showPassword = !showPassword}
+              tabindex="-1"
+            >
+              <Icon name={showPassword ? 'eye-off' : 'eye'} size={18} />
+            </button>
           </div>
           
           <div class="form-group remember-me">
@@ -193,6 +202,34 @@
     width: 100%;
     max-width: 300px;
     text-align: center;
+  }
+  
+  .password-group {
+    position: relative;
+  }
+  
+  .toggle-password {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-color-secondary);
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+  }
+  
+  .toggle-password:hover {
+    color: var(--text-color);
+  }
+  
+  .password-group input {
+    padding-right: 40px;
   }
   
   .remember-me {

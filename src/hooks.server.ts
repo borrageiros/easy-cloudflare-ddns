@@ -5,6 +5,7 @@ import { initializeInterval } from '$lib/utils/interval';
 import './routes/api/status/+server';
 import './routes/api/interval/toggle/+server';
 import './routes/api/interval/force/+server';
+import './routes/api/interval/force-update/+server';
 
 // Auth
 import './routes/api/login/+server';
