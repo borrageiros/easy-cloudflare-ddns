@@ -13,7 +13,7 @@ export async function verifyCredentials(email: string, apiKey: string): Promise<
       method: 'GET',
       headers: {
         'X-Auth-Email': email,
-        'Authorization': 'Bearer ' + apiKey,
+        'X-Auth-Key': apiKey,
         'Content-Type': 'application/json'
       }
     });
@@ -37,7 +37,7 @@ export async function getZones(): Promise<object[]> {
     method: 'GET',
     headers: {
       'X-Auth-Email': config.email,
-      'Authorization': 'Bearer ' + config.apiKey,
+      'X-Auth-Key': config.apiKey,
       'Content-Type': 'application/json'
     }
   });
@@ -63,14 +63,14 @@ export async function updateRecord(zoneId: string, recordId: string, query: obje
       method: 'PATCH',
       headers: {
         'X-Auth-Email': config.email,
-        'Authorization': 'Bearer ' + config.apiKey,
+        'X-Auth-Key': config.apiKey,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(query)
     });
     
     const cloudflareResponse = await response.json();
-    return cloudflareResponse;
+    return cloudflareResponse.success === true;
   } catch (error) {
     throw new Error('Failed to update record: ' + error);
   }
@@ -88,7 +88,7 @@ export async function getRecords(zoneId: string): Promise<object[]> {
     method: 'GET',
     headers: {
       'X-Auth-Email': config.email,
-      'Authorization': 'Bearer ' + config.apiKey,
+      'X-Auth-Key': config.apiKey,
       'Content-Type': 'application/json'
     }
   });
@@ -113,7 +113,7 @@ export async function getRecordIp(zoneId: string, recordId: string): Promise<str
     method: 'GET',
     headers: {
       'X-Auth-Email': config.email,
-      'Authorization': 'Bearer ' + config.apiKey,
+      'X-Auth-Key': config.apiKey,
       'Content-Type': 'application/json'
     }
   });
